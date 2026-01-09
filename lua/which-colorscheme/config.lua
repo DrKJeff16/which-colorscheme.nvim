@@ -1,7 +1,9 @@
 ---@class WhichColorschemeOpts
 ---@field prefix? string
 ---@field group? string
+---@field uppercase_groups? boolean
 ---@field random? boolean
+---@field inverse? boolean
 
 local Util = require('which-colorscheme.util')
 local WK = require('which-key')
@@ -14,7 +16,9 @@ function M.get_defaults()
   return { ---@type WhichColorschemeOpts
     prefix = '<leader>C',
     group = 'Colorschemes',
+    uppercase_groups = false,
     random = false,
+    inverse = false,
   }
 end
 
@@ -37,15 +41,17 @@ function M.map()
     error('which-key.nvim is not installed!')
   end
 
-  local prefix = M.config.prefix or '<leader>c'
-  local group = 'A' ---@type Letter
-  local i = 1
   local colors = require('which-colorscheme.color').calculate_colorschemes()
+  if M.config.inverse ~= nil and M.config.inverse then
+    colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
+  end
 
   if M.config.random ~= nil and M.config.random then
     colors = Util.randomize_list(vim.deepcopy(colors)) ---@type string[]
   end
 
+  local prefix, i = M.config.prefix or '<leader>c', 1 ---@type string, integer
+  local group = M.config.uppercase_groups and 'A' or 'a' ---@type Letter
   local keys = { { prefix, group = M.config.group or 'Colorschemes' } } ---@type wk.Spec
   for _, name in pairs(colors) do
     if i == 1 then
