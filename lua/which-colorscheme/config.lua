@@ -6,6 +6,7 @@
 ---@field random? boolean
 ---@field inverse? boolean
 
+local in_list = vim.list_contains
 local Util = require('which-colorscheme.util')
 local Color = require('which-colorscheme.color')
 local WK = require('which-key')
@@ -38,6 +39,13 @@ function M.setup(opts)
   vim.g.WhichColorscheme_setup = 1
 
   M.map()
+
+  vim.api.nvim_create_autocmd('ColorScheme', {
+    group = vim.api.nvim_create_augroup('WhichColorscheme', { clear = true }),
+    callback = function()
+      M.map()
+    end,
+  })
 end
 
 function M.map()
@@ -52,14 +60,25 @@ function M.map()
   if not M.config.include_builtin then
     colors = Color.remove_builtins(vim.deepcopy(colors))
   end
-
   if M.config.inverse ~= nil and M.config.inverse then
     colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
   end
-
   if M.config.random ~= nil and M.config.random then
     colors = Util.randomize_list(vim.deepcopy(colors)) ---@type string[]
   end
+
+  local current = vim.api.nvim_exec2('colorscheme', { output = true }).output ---@type string
+  if in_list(colors, current) then
+    local idx = 1
+    for i, v in ipairs(colors) do
+      if v == current then
+        idx = i
+        break
+      end
+    end
+    table.remove(colors, idx)
+  end
+  table.insert(colors, 1, current)
 
   local prefix, i = M.config.prefix or '<leader>c', 1 ---@type string, integer
   local group = M.config.uppercase_groups and 'A' or 'a' ---@type Letter
