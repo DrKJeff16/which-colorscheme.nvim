@@ -5,7 +5,7 @@
 ---@field [3]? boolean
 ---@field [4]? string
 
----@class MyPlugin.Util
+---@class WhichColorscheme.Util
 local M = {}
 
 ---Checks whether nvim is running on Windows.
@@ -301,4 +301,4 @@ function M.strip(char, str)
 end
 
 return M
--- vim: set ts=2 sts=2 sw=2 et ai si sta:
+-- vim: set ts=2 sts=2 sw=2  ai si sta:
