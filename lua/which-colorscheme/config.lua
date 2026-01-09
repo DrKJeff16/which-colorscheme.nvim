@@ -2,11 +2,14 @@
 ---@field prefix? string
 ---@field group? string
 ---@field uppercase_groups? boolean
+---@field include_builtin? boolean
 ---@field random? boolean
 ---@field inverse? boolean
 
 local Util = require('which-colorscheme.util')
+local Color = require('which-colorscheme.color')
 local WK = require('which-key')
+local ERROR = vim.log.levels.ERROR
 
 ---@class WhichColorscheme.Config
 local M = {}
@@ -17,6 +20,7 @@ function M.get_defaults()
     prefix = '<leader>C',
     group = 'Colorschemes',
     uppercase_groups = false,
+    include_builtin = false,
     random = false,
     inverse = false,
   }
@@ -31,17 +35,24 @@ function M.setup(opts)
   end
 
   M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
+  vim.g.WhichColorscheme_setup = 1
 
   M.map()
-  vim.g.WhichColorscheme_setup = 1
 end
 
 function M.map()
   if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!')
+    error('which-key.nvim is not installed!', ERROR)
+  end
+  if vim.g.WhichColorscheme_setup ~= 1 then
+    error('which-colorscheme.nvim has not been setup!', ERROR)
   end
 
-  local colors = require('which-colorscheme.color').calculate_colorschemes()
+  local colors = Color.calculate_colorschemes()
+  if not M.config.include_builtin then
+    colors = Color.remove_builtins(vim.deepcopy(colors))
+  end
+
   if M.config.inverse ~= nil and M.config.inverse then
     colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
   end

@@ -48,6 +48,7 @@ The default setup options are the following:
 {
   prefix = '<leader>C', -- The prefix to your keymap
   group = 'Colorschemes', -- The prefix group in `which-key.nvim`
+  include_builtin = false, -- Whether to include the built-in Neovim colorschemes
   uppercase_groups = false, -- Whether to use uppercase groups for keymaps
   random = false, -- Whether to randomize the mappings
   inverse = false, -- Whether to map your colorschemes from z-a (if random is `true`, this does nothing)
