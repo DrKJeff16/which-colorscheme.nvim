@@ -90,8 +90,8 @@ function M.map()
   table.insert(colors, 1, current)
 
   local prefix, i = M.config.prefix or '<leader>c', 1 ---@type string, integer
-  local group = M.config.uppercase_groups and 'A' or 'a' ---@type Letter
-  local keys = { { prefix, group = M.config.group or 'Colorschemes' } } ---@type wk.Spec
+  local group = M.config.groupping.uppercase_groups and 'A' or 'a' ---@type Letter
+  local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
   for _, name in pairs(colors) do
     if i == 1 then
       table.insert(keys, { prefix .. group, group = 'Group ' .. group })
