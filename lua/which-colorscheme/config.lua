@@ -1,10 +1,13 @@
----@class WhichColorschemeOpts
----@field prefix? string
----@field group? string
+---@class WhichColorschemeGroupping
 ---@field uppercase_groups? boolean
----@field include_builtin? boolean
 ---@field random? boolean
 ---@field inverse? boolean
+
+---@class WhichColorschemeOpts
+---@field prefix? string
+---@field group_name? string
+---@field include_builtin? boolean
+---@field groupping? WhichColorschemeGroupping
 
 local in_list = vim.list_contains
 local Util = require('which-colorscheme.util')
@@ -19,11 +22,13 @@ local M = {}
 function M.get_defaults()
   return { ---@type WhichColorschemeOpts
     prefix = '<leader>C',
-    group = 'Colorschemes',
-    uppercase_groups = false,
+    group_name = 'Colorschemes',
     include_builtin = false,
-    random = false,
-    inverse = false,
+    groupping = {
+      uppercase_groups = false,
+      random = false,
+      inverse = false,
+    },
   }
 end
 
@@ -57,14 +62,18 @@ function M.map()
   end
 
   local colors = Color.calculate_colorschemes()
+
   if not M.config.include_builtin then
     colors = Color.remove_builtins(vim.deepcopy(colors))
   end
-  if M.config.inverse ~= nil and M.config.inverse then
-    colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
-  end
-  if M.config.random ~= nil and M.config.random then
-    colors = Util.randomize_list(vim.deepcopy(colors)) ---@type string[]
+
+  if M.config.groupping then
+    if M.config.groupping.inverse ~= nil and M.config.groupping.inverse then
+      colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
+    end
+    if M.config.groupping.random ~= nil and M.config.groupping.random then
+      colors = Util.randomize_list(vim.deepcopy(colors)) ---@type string[]
+    end
   end
 
   local current = vim.api.nvim_exec2('colorscheme', { output = true }).output ---@type string
