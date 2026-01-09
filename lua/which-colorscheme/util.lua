@@ -5,48 +5,15 @@
 ---@field [3]? boolean
 ---@field [4]? string
 
+---@class DirectionFuncs
+---@field r fun(t: table<string, any>): table<string, any>
+---@field l fun(t: table<string, any>): table<string, any>
+
+local in_list = vim.list_contains
+local ERROR = vim.log.levels.ERROR
+
 ---@class WhichColorscheme.Util
 local M = {}
-
----Checks whether nvim is running on Windows.
---- ---
----@return boolean win32
-function M.is_windows()
-  return M.vim_has('win32')
-end
-
----Get rid of all duplicates in the given list.
----
----If the list is empty it'll just return it as-is.
----
----If the data passed to the function is not a table,
----an error will be raised.
---- ---
----@param T any[]
----@return any[] NT
-function M.dedup(T)
-  M.validate({ T = { T, { 'table' } } })
-
-  if vim.tbl_isempty(T) then
-    return T
-  end
-
-  local NT = {} ---@type any[]
-  for _, v in ipairs(T) do
-    local not_dup = false
-    if M.is_type('table', v) then
-      not_dup = not vim.tbl_contains(NT, function(val)
-        return vim.deep_equal(val, v)
-      end, { predicate = true })
-    else
-      not_dup = not vim.list_contains(NT, v)
-    end
-    if not_dup then
-      table.insert(NT, v)
-    end
-  end
-  return NT
-end
 
 ---@param feature string
 ---@return boolean has
@@ -89,6 +56,76 @@ function M.validate(T)
   end
 end
 
+---Checks whether nvim is running on Windows.
+--- ---
+---@return boolean win32
+function M.is_windows()
+  return M.vim_has('win32')
+end
+
+---Get rid of all duplicates in the given list.
+---
+---If the list is empty it'll just return it as-is.
+---
+---If the data passed to the function is not a table,
+---an error will be raised.
+--- ---
+---@param T any[]
+---@return any[] NT
+function M.dedup(T)
+  M.validate({ T = { T, { 'table' } } })
+
+  if vim.tbl_isempty(T) then
+    return T
+  end
+
+  local NT = {} ---@type any[]
+  for _, v in ipairs(T) do
+    local not_dup = false
+    ---@cast v table
+    if M.is_type('table', v) then
+      not_dup = not vim.tbl_contains(NT, function(val)
+        return vim.deep_equal(val, v)
+      end, { predicate = true })
+    else
+      ---@cast v any
+      not_dup = not in_list(NT, v)
+    end
+    if not_dup then
+      table.insert(NT, v)
+    end
+  end
+  return NT
+end
+
+---@param c string
+---@param direction 'next'|'prev'
+---@return Letter letter
+---@overload fun(c: string): letter: Letter
+function M.displace_letter(c, direction)
+  M.validate({
+    c = { c, { 'string' } },
+    direction = { direction, { 'string', 'nil' }, true },
+  })
+  direction = direction or 'next'
+  direction = in_list({ 'next', 'prev' }, direction) and direction or 'next'
+
+  local String = require('which-colorscheme.util.string')
+  local A = vim.deepcopy(String.alphabet)
+  local LOWER, UPPER = A.lower_map, A.upper_map
+
+  if not (in_list(vim.tbl_keys(LOWER), c) or in_list(vim.tbl_keys(UPPER), c)) then
+    return 'a'
+  end
+
+  local d = direction == 'prev' and 'r' or 'l' ---@type 'r'|'l'
+
+  if in_list(vim.tbl_keys(LOWER), c) then
+    return M.mv_tbl_values(LOWER, 1, d)[c]
+  end
+  return M.mv_tbl_values(UPPER, 1, d)[c]
+end
+
 ---@param T table<string|integer, any>
 ---@return integer len
 function M.get_dict_size(T)
@@ -128,12 +165,83 @@ function M.reverse(T)
   return T
 end
 
+---@param T (string|number)[]
+---@return (string|number)[] new_list
+function M.randomize_list(T)
+  M.validate({ T = { T, { 'table' } } })
+  if not vim.islist(T) then
+    error('Table is not a list!', ERROR)
+  end
+
+  if vim.tbl_isempty(T) then
+    return T
+  end
+
+  local new_list = {} ---@type (string|number)[]
+  local len = #T
+  while #new_list < len do
+    local item = T[math.random(1, len)]
+    if not in_list(new_list, item) then
+      table.insert(new_list, item)
+    end
+  end
+  return new_list
+end
+
+---@param T table<string, any>
+---@param steps? integer
+---@param direction? 'l'|'r'
+---@return table<string, any> res
+---@overload fun(T: table<string, any>): res: table<string, any>
+---@overload fun(T: table<string, any>, steps: integer): res: table<string, any>
+function M.mv_tbl_values(T, steps, direction)
+  M.validate({
+    T = { T, { 'table' } },
+    steps = { steps, { 'number', 'nil' }, true },
+    direction = { direction, { 'string', 'nil' }, true },
+  })
+  steps = steps or 1
+  steps = (steps > 0 and M.is_int(steps)) and steps or 1
+  direction = direction or 'r'
+  direction = in_list({ 'l', 'r' }, direction) and direction or 'r'
+
+  local direction_funcs = { ---@type DirectionFuncs
+    r = function(t)
+      local keys = vim.tbl_keys(t) ---@type string[]
+      table.sort(keys)
+
+      local res = {} ---@type table<string, any>
+      for i, v in ipairs(keys) do
+        res[v] = t[keys[i == 1 and #keys or (i - 1)]]
+      end
+      return res
+    end,
+    l = function(t)
+      local keys = vim.tbl_keys(t) ---@type string[]
+      table.sort(keys)
+
+      local res = {} ---@type table<string, any>
+      for i, v in ipairs(keys) do
+        res[v] = t[keys[i == #keys and 1 or (i + 1)]]
+      end
+      return res
+    end,
+  }
+
+  local res, func = T, direction_funcs[direction]
+  while steps > 0 do
+    res = func(res)
+    steps = steps - 1
+  end
+  return res
+end
+
 ---Checks if module `mod` exists to be imported.
 --- ---
 ---@param mod string The `require()` argument to be checked
 ---@param ret? boolean Whether to return the called module
 ---@return boolean exists A boolean indicating whether the module exists or not
----@return unknown? module
+---@return unknown module
 ---@overload fun(mod: string): exists: boolean
 function M.mod_exists(mod, ret)
   M.validate({

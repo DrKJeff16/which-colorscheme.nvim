@@ -9,8 +9,6 @@ function M.setup(opts)
   util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
   config.setup(opts or {})
-
-  -- ...
 end
 
 return M
