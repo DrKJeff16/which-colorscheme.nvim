@@ -2,7 +2,7 @@
 
 Use [`which-key.nvim`](https://github.com/folke/which-key.nvim) bindings to cycle between your colorschemes.
 
-<!-- INSERT VIDEOS HERE! -->
+https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 
 ---
 
