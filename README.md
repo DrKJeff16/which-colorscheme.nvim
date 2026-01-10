@@ -71,6 +71,8 @@ require('which-colorscheme').setup({
 })
 ```
 
+https://github.com/user-attachments/assets/53e72f8e-71cc-4cf8-9a6c-5927b3fb7fad
+
 ---
 
 ## License
