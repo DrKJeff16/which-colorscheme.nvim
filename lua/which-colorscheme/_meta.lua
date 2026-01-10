@@ -22,7 +22,7 @@
 ---@field prefix? string
 ---@field group_name? string
 ---@field include_builtin? boolean
----@field groupping? WhichColorschemeGroupping
+---@field grouping? WhichColorschemeGroupping
 ---@field custom_groups? WhichColorschemeGroups
 
 -- vim: set ts=2 sts=2 sw=2  ai si sta:

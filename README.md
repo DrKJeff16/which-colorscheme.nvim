@@ -11,6 +11,7 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Configuration](#configuration)
+  - [Custom Grouping](#custom-grouping)
 - [License](#license)
 
 ---
@@ -49,12 +50,28 @@ The default setup options are the following:
   prefix = '<leader>C', -- The prefix to your keymap
   group_name = 'Colorschemes', -- The prefix group in `which-key.nvim`
   include_builtin = false, -- Whether to include the built-in Neovim colorschemes
-  groupping = {
+  custom_groups = {}, -- Custom groups for colorschemes (see the `Custom Groups` section below)
+  grouping = {
     uppercase_groups = false, -- Whether to use uppercase groups for keymaps
     random = false, -- Whether to randomize the mappings
     inverse = false, -- Whether to map your colorschemes from z-a (if random is `true`, this does nothing)
   },
 }
+```
+
+### Custom Grouping
+
+If you wish to order your colorschemes manually you can use the `custom_groups` option:
+
+```lua
+require('which-colorscheme').setup({
+  custom_groups = {
+    A = { 'tokyonight', 'tokyonight-storm', 'tokyonight-moon', 'tokyonight-night', 'tokyonight-day' },
+    -- Skip section B
+    C = { '', 'catppuccin' }, -- Blank strings are ignored
+    D = { 'foo' }, -- If `foo` is not a colorscheme it'll get skipped
+  },
+})
 ```
 
 ---

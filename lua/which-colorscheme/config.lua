@@ -18,7 +18,7 @@ function M.get_defaults()
     group_name = 'Colorschemes',
     include_builtin = false,
     custom_groups = {},
-    groupping = {
+    grouping = {
       uppercase_groups = false,
       random = false,
       inverse = false,
@@ -109,11 +109,11 @@ function M.map()
     colors = Color.remove_builtins(vim.deepcopy(colors))
   end
 
-  if M.config.groupping then
-    if M.config.groupping.inverse ~= nil and M.config.groupping.inverse then
+  if M.config.grouping then
+    if M.config.grouping.inverse ~= nil and M.config.grouping.inverse then
       colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
     end
-    if M.config.groupping.random ~= nil and M.config.groupping.random then
+    if M.config.grouping.random ~= nil and M.config.grouping.random then
       colors = Util.randomize_list(vim.deepcopy(colors)) ---@type string[]
     end
   end
@@ -131,7 +131,7 @@ function M.map()
   end
   table.insert(colors, 1, current)
 
-  M.generate_maps(colors, M.config.groupping.uppercase_groups and 'A' or 'a')
+  M.generate_maps(colors, M.config.grouping.uppercase_groups and 'A' or 'a')
 
   local prefix = M.config.prefix or '<leader>c' ---@type string
   local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
