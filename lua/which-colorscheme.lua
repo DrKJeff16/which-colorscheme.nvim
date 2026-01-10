@@ -13,3 +13,4 @@ end
 
 return M
 -- vim: set ts=2 sts=2 sw=2  ai si sta:
+-- vim: set ts=2 sts=2 sw=2 et ai si sta:
