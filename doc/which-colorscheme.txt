@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 
 ------------------------------------------------------------------------------
 
-TABLE OF CONTENTS *which-colorscheme-which-colorscheme.nvim-table-of-contents*
+TABLE OF CONTENTS                        *which-colorscheme-table-of-contents*
 
 - |which-colorscheme-installation|
 - |which-colorscheme-configuration|
@@ -20,7 +20,7 @@ TABLE OF CONTENTS *which-colorscheme-which-colorscheme.nvim-table-of-contents*
 
 ------------------------------------------------------------------------------
 
-INSTALLATION           *which-colorscheme-which-colorscheme.nvim-installation*
+INSTALLATION                                  *which-colorscheme-installation*
 
 **Requirements**:
 
@@ -44,7 +44,7 @@ this plugin!
 
 ------------------------------------------------------------------------------
 
-CONFIGURATION         *which-colorscheme-which-colorscheme.nvim-configuration*
+CONFIGURATION                                *which-colorscheme-configuration*
 
 The default setup options are the following:
 
@@ -82,7 +82,7 @@ option:
 
 ------------------------------------------------------------------------------
 
-LICENSE                     *which-colorscheme-which-colorscheme.nvim-license*
+LICENSE                                            *which-colorscheme-license*
 
 MIT <./LICENSE>
 
