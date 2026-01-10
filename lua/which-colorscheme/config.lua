@@ -1,13 +1,4 @@
----@class WhichColorschemeGroupping
----@field uppercase_groups? boolean
----@field random? boolean
----@field inverse? boolean
-
----@class WhichColorschemeOpts
----@field prefix? string
----@field group_name? string
----@field include_builtin? boolean
----@field groupping? WhichColorschemeGroupping
+---@module 'which-colorscheme._meta'
 
 local in_list = vim.list_contains
 local Util = require('which-colorscheme.util')
@@ -18,12 +9,15 @@ local ERROR = vim.log.levels.ERROR
 ---@class WhichColorscheme.Config
 local M = {}
 
+M.maps = {} ---@type WhichColorschemeGroups
+
 ---@return WhichColorschemeOpts defaults
 function M.get_defaults()
   return { ---@type WhichColorschemeOpts
     prefix = '<leader>C',
     group_name = 'Colorschemes',
     include_builtin = false,
+    custom_groups = {},
     groupping = {
       uppercase_groups = false,
       random = false,
@@ -53,12 +47,60 @@ function M.setup(opts)
   })
 end
 
+---@param colors string[]
+---@param group Letter
+function M.generate_maps(colors, group)
+  Util.validate({
+    colors = { colors, { 'table' } },
+    group = { group, { 'string' } },
+  })
+
+  if not M.config.custom_groups then
+    return
+  end
+
+  M.maps = {}
+  M.manually_set = {} ---@type string[]
+  for custom_group, category in pairs(M.config.custom_groups) do
+    M.maps[custom_group] = {}
+    for _, color in ipairs(category) do
+      if in_list(colors, color) and not in_list(M.manually_set, color) then
+        table.insert(M.manually_set, color)
+        table.insert(M.maps[custom_group], color)
+      end
+    end
+  end
+
+  local i, idx = 1, 1
+  while idx < #colors do
+    if not M.maps[group] then
+      M.maps[group] = {}
+    end
+    local color = colors[idx]
+    if M.maps[group][i] then
+      if not (in_list(colors, M.maps[group][i]) or in_list(M.manually_set, color)) then
+        M.maps[group][i] = color
+      end
+    else
+      M.maps[group][i] = color
+    end
+    idx = idx + 1
+
+    if i == 9 then
+      i = 1
+      group = Util.displace_letter(group)
+    elseif i < 9 then
+      i = i + 1
+    end
+  end
+end
+
 function M.map()
   if not Util.mod_exists('which-key') then
     error('which-key.nvim is not installed!', ERROR)
   end
   if vim.g.WhichColorscheme_setup ~= 1 then
-    error('which-colorscheme.nvim has not been setup!', ERROR)
+    return
   end
 
   local colors = Color.calculate_colorschemes()
@@ -89,24 +131,21 @@ function M.map()
   end
   table.insert(colors, 1, current)
 
-  local prefix, i = M.config.prefix or '<leader>c', 1 ---@type string, integer
-  local group = M.config.groupping.uppercase_groups and 'A' or 'a' ---@type Letter
+  M.generate_maps(colors, M.config.groupping.uppercase_groups and 'A' or 'a')
+
+  local prefix = M.config.prefix or '<leader>c' ---@type string
   local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
-  for _, name in pairs(colors) do
-    if i == 1 then
-      table.insert(keys, { prefix .. group, group = 'Group ' .. group })
-    end
-    table.insert(keys, {
-      prefix .. group .. tostring(i),
-      ('<CMD>colorscheme %s<CR>'):format(name),
-      desc = ('Set Colorscheme `%s`'):format(name),
-      mode = 'n',
-    })
-    if i == 9 then
-      i = 1
-      group = Util.displace_letter(group)
-    elseif i < 9 then
-      i = i + 1
+  for group, category in pairs(M.maps) do
+    table.insert(keys, { prefix .. group, group = 'Group ' .. group })
+    for i, color in ipairs(category) do
+      table.insert(keys, {
+        prefix .. group .. tostring(i),
+        function()
+          vim.cmd.colorscheme(color)
+        end,
+        desc = ('Set Colorscheme `%s`'):format(color),
+        mode = 'n',
+      })
     end
   end
 
