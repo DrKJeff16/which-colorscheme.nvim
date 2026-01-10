@@ -16,14 +16,12 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 
 ---
 
-## Requirements
-
-- Neovim >= v0.9.0
-- [`which-key.nvim`](https://github.com/folke/which-key.nvim)
-
----
-
 ## Installation
+
+> **Requirements**
+>
+> - Neovim >= v0.9.0
+> - [`which-key.nvim`](https://github.com/folke/which-key.nvim)
 
 [`folke/lazy.nvim`](https://github.com/folke/lazy.nvim) is highly recommended to install this plugin!
 
@@ -55,6 +53,7 @@ The default setup options are the following:
     uppercase_groups = false, -- Whether to use uppercase groups for keymaps
     random = false, -- Whether to randomize the mappings
     inverse = false, -- Whether to map your colorschemes from z-a (if random is `true`, this does nothing)
+    current_first = true, -- Whether to put the current colorscheme in the first group
   },
 }
 ```

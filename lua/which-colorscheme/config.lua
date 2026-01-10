@@ -22,6 +22,7 @@ function M.get_defaults()
       uppercase_groups = false,
       random = false,
       inverse = false,
+      current_first = true,
     },
   }
 end
@@ -125,18 +126,20 @@ function M.map()
     end
   end
 
-  local current = vim.api.nvim_exec2('colorscheme', { output = true }).output ---@type string
-  if in_list(colors, current) then
-    local idx = 1
-    for i, v in ipairs(colors) do
-      if v == current then
-        idx = i
-        break
+  if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
+    local current = vim.api.nvim_exec2('colorscheme', { output = true }).output ---@type string
+    if in_list(colors, current) then
+      local idx = 1
+      for i, v in ipairs(colors) do
+        if v == current then
+          idx = i
+          break
+        end
       end
+      table.remove(colors, idx)
     end
-    table.remove(colors, idx)
+    table.insert(colors, 1, current)
   end
-  table.insert(colors, 1, current)
 
   M.generate_maps(colors, M.config.grouping.uppercase_groups and 'A' or 'a')
 

@@ -17,6 +17,7 @@
 ---@field uppercase_groups? boolean
 ---@field random? boolean
 ---@field inverse? boolean
+---@field current_first? boolean
 
 ---@class WhichColorschemeOpts
 ---@field prefix? string
