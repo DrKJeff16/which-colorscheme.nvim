@@ -13,7 +13,6 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 
 TABLE OF CONTENTS *which-colorscheme-which-colorscheme.nvim-table-of-contents*
 
-- |which-colorscheme-requirements|
 - |which-colorscheme-installation|
 - |which-colorscheme-configuration|
     - |which-colorscheme-custom-grouping|
@@ -23,16 +22,17 @@ TABLE OF CONTENTS *which-colorscheme-which-colorscheme.nvim-table-of-contents*
 
 INSTALLATION           *which-colorscheme-which-colorscheme.nvim-installation*
 
+**Requirements**:
 
-  **Requirements**
-  - Neovim >= v0.9.0
-  - `which-key.nvim` <https://github.com/folke/which-key.nvim>
+- Neovim >= v0.9.0
+- `which-key.nvim` <https://github.com/folke/which-key.nvim>
+
 `folke/lazy.nvim` <https://github.com/folke/lazy.nvim> is highly recommended to
 install this plugin!
 
+**IMPORTANT**: Load `which-key.nvim` and all your colorschemes BEFORE you load
+this plugin!
 
-  [!IMPORTANT] **Load which-key.nvim and all your colorschemes BEFORE you load
-  this plugin!**
 >lua
     {
       'DrKJeff16/which-colorscheme.nvim',
