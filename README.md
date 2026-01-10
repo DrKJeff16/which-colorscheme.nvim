@@ -8,7 +8,6 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 
 ## Table of Contents
 
-- [Requirements](#requirements)
 - [Installation](#installation)
 - [Configuration](#configuration)
   - [Custom Grouping](#custom-grouping)
@@ -18,15 +17,14 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 
 ## Installation
 
-> **Requirements**
->
-> - Neovim >= v0.9.0
-> - [`which-key.nvim`](https://github.com/folke/which-key.nvim)
+**Requirements**:
+
+- Neovim >= v0.9.0
+- [`which-key.nvim`](https://github.com/folke/which-key.nvim)
 
 [`folke/lazy.nvim`](https://github.com/folke/lazy.nvim) is highly recommended to install this plugin!
 
-> [!IMPORTANT]
-> **Load `which-key.nvim` and all your colorschemes BEFORE you load this plugin!**
+**IMPORTANT**: Load `which-key.nvim` and all your colorschemes BEFORE you load this plugin!
 
 ```lua
 {
