@@ -4,6 +4,7 @@ local Util = require('which-colorscheme.util')
 local Color = require('which-colorscheme.color')
 local WK = require('which-key')
 local ERROR = vim.log.levels.ERROR
+local in_list = vim.list_contains
 
 ---@class WhichColorscheme.Config
 ---@field config WhichColorschemeOpts
@@ -67,28 +68,34 @@ function M.generate_maps(colors, group)
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if Color.is_color(color) and not vim.list_contains(M.manually_set, color) then
+      if Color.is_color(color) and not in_list(M.manually_set, color) then
         table.insert(M.manually_set, color)
         table.insert(M.maps[custom_group], color)
       end
     end
   end
 
-  local new_colors = {} ---@type string[]
+  M.new_colors = {} ---@type string[]
   for _, color in ipairs(colors) do
-    if not vim.list_contains(M.manually_set, color) then
-      table.insert(new_colors, color)
+    if not in_list(M.manually_set, color) then
+      table.insert(M.new_colors, color)
     end
   end
 
+  if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
+    M.new_colors = Util.move_start(vim.deepcopy(M.new_colors), Color.get_current()) ---@type string[]
+  end
+
   local i, idx = 1, 1
-  while idx < #new_colors do
+  while idx < #M.new_colors do
     if not M.maps[group] then
       M.maps[group] = {}
     end
-    local color = new_colors[idx]
-    if not M.maps[group][i] or vim.list_contains(new_colors, M.maps[group][i]) then
-      M.maps[group][i] = color
+    if not (M.maps[group][i] and in_list(colors, M.maps[group][i])) then
+      local color = M.new_colors[idx]
+      if not (in_list(M.new_colors, M.maps[group][i]) or in_list(M.manually_set, color)) then
+        M.maps[group][i] = color
+      end
     end
     idx = idx + 1
 
@@ -125,18 +132,7 @@ function M.map()
   end
 
   if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    local current = Color.get_current()
-    if Color.is_color(current) then
-      local idx = 1
-      for i, v in ipairs(colors) do
-        if v == current then
-          idx = i
-          break
-        end
-      end
-      table.remove(colors, idx)
-    end
-    table.insert(colors, 1, current)
+    colors = Util.move_start(vim.deepcopy(colors), Color.get_current()) ---@type string[]
   end
 
   M.generate_maps(colors, M.config.grouping.uppercase_groups and 'A' or 'a')

@@ -44,6 +44,25 @@ function M.vim_has(feature)
   return vim.fn.has(feature) == 1
 end
 
+---@param T any[]
+---@param item string|number|boolean
+---@return any[] T
+function M.move_start(T, item)
+  M.validate({
+    T = { T, { 'table' } },
+    item = { item, { 'string', 'number', 'boolean' } },
+  })
+
+  local new_list = { item } ---@type any[]
+  for _, v in ipairs(T) do
+    if v ~= item then
+      table.insert(new_list, v)
+    end
+  end
+
+  return T
+end
+
 ---Dynamic `vim.validate()` wrapper which covers both legacy and newer implementations.
 --- ---
 ---@param T table<string, vim.validate.Spec|ValidateSpec>
