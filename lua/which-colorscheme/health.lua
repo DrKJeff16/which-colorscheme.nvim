@@ -5,7 +5,6 @@ local M = {}
 
 function M.check()
   vim.health.start('Setup')
-
   if not Util.mod_exists('which-key') then
     vim.health.error('`which-key.nvim` is not installed!')
     return
@@ -16,7 +15,7 @@ function M.check()
     vim.health.error('`which-colorscheme.nvim` has not been setup correctly!')
     return
   end
-  vim.health.ok('`which-colorscheme.nvim` setup!')
+  vim.health.ok('`which-colorscheme.nvim` set up!')
 
   vim.health.start('Config')
   for k, v in pairs(require('which-colorscheme.config').config) do

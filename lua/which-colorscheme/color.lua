@@ -1,9 +1,11 @@
+local Util = require('which-colorscheme.util')
+
 ---@class WhichColorscheme.Color
 local M = {}
 
 ---@return string[] colorschemes
 function M.calculate_colorschemes()
-  local colorschemes = vim.fn.getcompletion('', 'color') ---@type string[]
+  local colorschemes = vim.fn.getcompletion('', 'color')
   table.sort(colorschemes)
 
   return colorschemes
@@ -12,6 +14,8 @@ end
 ---@param colors string[]
 ---@return string[] colorschemes
 function M.remove_builtins(colors)
+  Util.validate({ colors = { colors, { 'table' } } })
+
   local builtins = {
     'blue',
     'darkblue',

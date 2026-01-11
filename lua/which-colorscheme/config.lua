@@ -85,11 +85,7 @@ function M.generate_maps(colors, group)
       M.maps[group] = {}
     end
     local color = new_colors[idx]
-    if M.maps[group][i] then
-      if in_list(new_colors, M.maps[group][i]) then
-        M.maps[group][i] = color
-      end
-    else
+    if not M.maps[group][i] or in_list(new_colors, M.maps[group][i]) then
       M.maps[group][i] = color
     end
     idx = idx + 1

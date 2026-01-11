@@ -12,6 +12,29 @@
 local in_list = vim.list_contains
 local ERROR = vim.log.levels.ERROR
 
+local direction_funcs = { ---@type DirectionFuncs
+  r = function(t)
+    local keys = vim.tbl_keys(t) ---@type string[]
+    table.sort(keys)
+
+    local res = {} ---@type table<string, any>
+    for i, v in ipairs(keys) do
+      res[v] = t[keys[i == 1 and #keys or (i - 1)]]
+    end
+    return res
+  end,
+  l = function(t)
+    local keys = vim.tbl_keys(t) ---@type string[]
+    table.sort(keys)
+
+    local res = {} ---@type table<string, any>
+    for i, v in ipairs(keys) do
+      res[v] = t[keys[i == #keys and 1 or (i + 1)]]
+    end
+    return res
+  end,
+}
+
 ---@class WhichColorscheme.Util
 local M = {}
 
@@ -200,33 +223,8 @@ function M.mv_tbl_values(T, steps, direction)
     steps = { steps, { 'number', 'nil' }, true },
     direction = { direction, { 'string', 'nil' }, true },
   })
-  steps = steps or 1
-  steps = (steps > 0 and M.is_int(steps)) and steps or 1
-  direction = direction or 'r'
-  direction = in_list({ 'l', 'r' }, direction) and direction or 'r'
-
-  local direction_funcs = { ---@type DirectionFuncs
-    r = function(t)
-      local keys = vim.tbl_keys(t) ---@type string[]
-      table.sort(keys)
-
-      local res = {} ---@type table<string, any>
-      for i, v in ipairs(keys) do
-        res[v] = t[keys[i == 1 and #keys or (i - 1)]]
-      end
-      return res
-    end,
-    l = function(t)
-      local keys = vim.tbl_keys(t) ---@type string[]
-      table.sort(keys)
-
-      local res = {} ---@type table<string, any>
-      for i, v in ipairs(keys) do
-        res[v] = t[keys[i == #keys and 1 or (i + 1)]]
-      end
-      return res
-    end,
-  }
+  steps = (steps and steps > 0 and M.is_int(steps)) and steps or 1
+  direction = (direction and in_list({ 'l', 'r' }, direction)) and direction or 'r'
 
   local res, func = T, direction_funcs[direction]
   while steps > 0 do
