@@ -172,8 +172,8 @@ end
 ---If the data passed to the function is not a table,
 ---an error will be raised.
 --- ---
----@param T any[]
----@return any[] T
+---@param T (string|number|boolean)[]
+---@return (string|number|boolean)[] T
 function M.reverse(T)
   M.validate({ T = { T, { 'table' } } })
 

@@ -1,15 +1,17 @@
 ---@module 'which-colorscheme._meta'
 
-local in_list = vim.list_contains
 local Util = require('which-colorscheme.util')
 local Color = require('which-colorscheme.color')
 local WK = require('which-key')
 local ERROR = vim.log.levels.ERROR
 
 ---@class WhichColorscheme.Config
-local M = {}
-
-M.maps = {} ---@type WhichColorschemeGroups
+---@field config WhichColorschemeOpts
+---@field manually_set string[]
+---@field maps WhichColorschemeGroups
+local M = {
+  maps = {},
+}
 
 ---@return WhichColorschemeOpts defaults
 function M.get_defaults()
@@ -61,11 +63,11 @@ function M.generate_maps(colors, group)
   end
 
   M.maps = {}
-  M.manually_set = {} ---@type string[]
+  M.manually_set = {}
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if in_list(colors, color) and not in_list(M.manually_set, color) then
+      if Color.is_color(color) and not vim.list_contains(M.manually_set, color) then
         table.insert(M.manually_set, color)
         table.insert(M.maps[custom_group], color)
       end
@@ -74,7 +76,7 @@ function M.generate_maps(colors, group)
 
   local new_colors = {} ---@type string[]
   for _, color in ipairs(colors) do
-    if not in_list(M.manually_set, color) then
+    if not vim.list_contains(M.manually_set, color) then
       table.insert(new_colors, color)
     end
   end
@@ -85,7 +87,7 @@ function M.generate_maps(colors, group)
       M.maps[group] = {}
     end
     local color = new_colors[idx]
-    if not M.maps[group][i] or in_list(new_colors, M.maps[group][i]) then
+    if not M.maps[group][i] or vim.list_contains(new_colors, M.maps[group][i]) then
       M.maps[group][i] = color
     end
     idx = idx + 1
@@ -123,8 +125,8 @@ function M.map()
   end
 
   if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    local current = vim.api.nvim_exec2('colorscheme', { output = true }).output ---@type string
-    if in_list(colors, current) then
+    local current = Color.get_current()
+    if Color.is_color(current) then
       local idx = 1
       for i, v in ipairs(colors) do
         if v == current then
@@ -145,11 +147,11 @@ function M.map()
     table.insert(keys, { prefix .. group, group = 'Group ' .. group })
     for i, color in ipairs(category) do
       table.insert(keys, {
-        prefix .. group .. tostring(i),
+        ('%s%s%s'):format(prefix, group, i),
         function()
           vim.cmd.colorscheme(color)
         end,
-        desc = ('Set Colorscheme `%s`'):format(color),
+        desc = ('Set `%s`'):format(color),
         mode = 'n',
       })
     end

@@ -3,12 +3,25 @@ local Util = require('which-colorscheme.util')
 ---@class WhichColorscheme.Color
 local M = {}
 
+---@return string current
+function M.get_current()
+  return vim.api.nvim_exec2('colorscheme', { output = true }).output
+end
+
 ---@return string[] colorschemes
 function M.calculate_colorschemes()
   local colorschemes = vim.fn.getcompletion('', 'color')
   table.sort(colorschemes)
 
   return colorschemes
+end
+
+---@param color string
+---@return boolean result
+function M.is_color(color)
+  Util.validate({ color = { color, { 'string' } } })
+
+  return vim.list_contains(vim.fn.getcompletion('', 'color'), color)
 end
 
 ---@param colors string[]
