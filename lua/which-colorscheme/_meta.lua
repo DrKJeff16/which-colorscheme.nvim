@@ -7,9 +7,11 @@
 ---@field [3]? boolean
 ---@field [4]? string
 
+---@alias DirectionFunc fun(t: table<string, any>): new_direction: table<string, any>
+
 ---@class DirectionFuncs
----@field r fun(t: table<string, any>): new_direction: table<string, any>
----@field l fun(t: table<string, any>): new_direction: table<string, any>
+---@field r DirectionFunc
+---@field l DirectionFunc
 
 ---@class WhichColorschemeGroup
 ---@field [1]? string

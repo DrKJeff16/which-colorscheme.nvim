@@ -1,7 +1,5 @@
 ---@module 'which-colorscheme._meta'
 
-local in_list = vim.list_contains
-
 ---@class WhichColorscheme.Util.String
 local M = {}
 
@@ -181,7 +179,7 @@ function M.capitalize(str, use_dot, triggers)
   local prev_char, new_str, i = '', '', 1
   while i <= strlen do
     local char = str:sub(i, i)
-    if char == char:lower() and in_list(triggers, prev_char) then
+    if char == char:lower() and vim.list_contains(triggers, prev_char) then
       char = dot and char:upper() or char:lower()
       if dot then
         dot = false
@@ -213,7 +211,7 @@ function M.replace(str, target, new)
     target = { target, { 'string' } },
     new = { new, { 'string' } },
   })
-  if in_list({ str:len(), target:len(), new:len() }, 0) or new == target then
+  if vim.list_contains({ str:len(), target:len(), new:len() }, 0) or new == target then
     return str
   end
 

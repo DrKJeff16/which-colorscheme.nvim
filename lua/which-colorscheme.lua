@@ -4,7 +4,8 @@ local config = require('which-colorscheme.config')
 ---@class WhichColorscheme
 local M = {}
 
----@param opts? WhichColorschemeOpts
+---@param opts WhichColorschemeOpts|nil
+---@overload fun()
 function M.setup(opts)
   util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
