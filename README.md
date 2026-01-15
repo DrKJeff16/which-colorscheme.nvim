@@ -9,6 +9,7 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 ## Table of Contents
 
 - [Installation](#installation)
+  - [LuaRocks](#luarocks)
 - [Configuration](#configuration)
   - [Custom Grouping](#custom-grouping)
 - [License](#license)
@@ -33,6 +34,15 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
   dependencies = { 'folke/which-key.nvim' },
   opts = {},
 }
+```
+
+### LuaRocks
+
+You can also install this through [LuaRocks](https://luarocks.org/modules/drkjeff16/which-colorscheme.nvim):
+
+```bash
+luarocks install which-colorscheme.nvim # Global install
+luarocks install --local which-colorscheme.nvim # Local install
 ```
 
 ---
