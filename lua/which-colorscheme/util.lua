@@ -119,9 +119,9 @@ function M.dedup(T)
 end
 
 ---@param c string
----@param direction 'next'|'prev'
----@return Letter letter
----@overload fun(c: string): letter: Letter
+---@param direction 'next'|'prev'|nil
+---@return string letter
+---@overload fun(c: string): letter: string
 function M.displace_letter(c, direction)
   M.validate({
     c = { c, { 'string' } },
@@ -206,12 +206,11 @@ function M.randomize_list(T)
 end
 
 ---@param T table<string, any>
----@param steps integer
----@param direction 'l'|'r'
+---@param steps integer|nil
+---@param direction 'l'|'r'|nil
 ---@return table<string, any> res
 ---@overload fun(T: table<string, any>): res: table<string, any>
----@overload fun(T: table<string, any>, steps: integer): res: table<string, any>
----@overload fun(T: table<string, any>, steps?: integer, direction: 'l'|'r'): res: table<string, any>
+---@overload fun(T: table<string, any>, steps: integer|nil): res: table<string, any>
 function M.mv_tbl_values(T, steps, direction)
   M.validate({
     T = { T, { 'table' } },
@@ -232,7 +231,7 @@ end
 ---Checks if module `mod` exists to be imported.
 --- ---
 ---@param mod string The `require()` argument to be checked
----@param ret? boolean Whether to return the called module
+---@param ret boolean|nil Whether to return the called module
 ---@return boolean exists A boolean indicating whether the module exists or not
 ---@return unknown module
 ---@overload fun(mod: string): exists: boolean
@@ -303,8 +302,6 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
----@overload fun(char: string[], str: string): new_str: string
----@overload fun(char: string, str: string): new_str: string
 function M.lstrip(char, str)
   M.validate({
     char = { char, { 'string', 'table' } },
@@ -345,8 +342,6 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
----@overload fun(char: string[], str: string): new_str: string
----@overload fun(char: string, str: string): new_str: string
 function M.rstrip(char, str)
   M.validate({
     char = { char, { 'string', 'table' } },
@@ -381,8 +376,6 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
----@overload fun(char: string[], str: string): new_str: string
----@overload fun(char: string, str: string): new_str: string
 function M.strip(char, str)
   M.validate({
     char = { char, { 'string', 'table' } },
