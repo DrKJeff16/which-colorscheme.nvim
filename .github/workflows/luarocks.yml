@@ -16,6 +16,8 @@ jobs:
           license: "MIT"
           detailed_description: |
             Use which-key.nvim bindings to cycle between your colorschemes.
+          dependencies: |
+            which-key.nvim
           labels: |
             neovim
           copy_directories: |
