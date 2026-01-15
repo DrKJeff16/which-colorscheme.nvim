@@ -1,4 +1,4 @@
-*which-colorscheme.txt*     For NVIM >=v0.9.0     Last change: 2026 January 10
+*which-colorscheme.txt*     For NVIM >=v0.9.0     Last change: 2026 January 15
 
 ==============================================================================
 1. which-colorscheme.nvim           *which-colorscheme-which-colorscheme.nvim*
@@ -14,6 +14,7 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
 TABLE OF CONTENTS                        *which-colorscheme-table-of-contents*
 
 - |which-colorscheme-installation|
+    - |which-colorscheme-luarocks|
 - |which-colorscheme-configuration|
     - |which-colorscheme-custom-grouping|
 - |which-colorscheme-license|
@@ -40,6 +41,17 @@ this plugin!
       dependencies = { 'folke/which-key.nvim' },
       opts = {},
     }
+<
+
+
+LUAROCKS ~
+
+You can also install this through LuaRocks
+<https://luarocks.org/modules/drkjeff16/which-colorscheme.nvim>:
+
+>bash
+    luarocks install which-colorscheme.nvim # Global install
+    luarocks install --local which-colorscheme.nvim # Local install
 <
 
 ------------------------------------------------------------------------------
