@@ -39,7 +39,7 @@ function M.setup(opts)
   end
 
   M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
-  vim.g.WhichColorscheme_setup = 1
+  vim.g.which_colorscheme_setup = 1
 
   M.map()
 
@@ -112,7 +112,7 @@ function M.map()
   if not Util.mod_exists('which-key') then
     error('which-key.nvim is not installed!', ERROR)
   end
-  if vim.g.WhichColorscheme_setup ~= 1 then
+  if vim.g.which_colorscheme_setup ~= 1 then
     return
   end
 

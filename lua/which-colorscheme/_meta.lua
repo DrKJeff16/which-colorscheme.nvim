@@ -1,5 +1,16 @@
 ---@meta
 
+---Non-legacy validation spec (>=v0.11)
+---@class ValidateSpec
+---@field [1] any
+---@field [2] vim.validate.Validator
+---@field [3]? boolean
+---@field [4]? string
+
+---@class DirectionFuncs
+---@field r fun(t: table<string, any>): new_direction: table<string, any>
+---@field l fun(t: table<string, any>): new_direction: table<string, any>
+
 ---@class WhichColorschemeGroup
 ---@field [1]? string
 ---@field [2]? string
@@ -25,5 +36,59 @@
 ---@field include_builtin? boolean
 ---@field grouping? WhichColorschemeGroupping
 ---@field custom_groups? WhichColorschemeGroups
+
+---@alias Letter
+---|'a'
+---|'b'
+---|'c'
+---|'d'
+---|'e'
+---|'f'
+---|'g'
+---|'h'
+---|'i'
+---|'j'
+---|'k'
+---|'l'
+---|'m'
+---|'n'
+---|'o'
+---|'p'
+---|'q'
+---|'r'
+---|'s'
+---|'t'
+---|'u'
+---|'v'
+---|'w'
+---|'x'
+---|'y'
+---|'z'
+---|'A'
+---|'B'
+---|'C'
+---|'D'
+---|'E'
+---|'F'
+---|'G'
+---|'H'
+---|'I'
+---|'J'
+---|'K'
+---|'L'
+---|'M'
+---|'N'
+---|'O'
+---|'P'
+---|'Q'
+---|'R'
+---|'S'
+---|'T'
+---|'U'
+---|'V'
+---|'W'
+---|'X'
+---|'Y'
+---|'Z'
 
 -- vim: set ts=2 sts=2 sw=2 et ai si sta:

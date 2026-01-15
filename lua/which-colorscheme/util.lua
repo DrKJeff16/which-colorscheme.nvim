@@ -1,13 +1,4 @@
----Non-legacy validation spec (>=v0.11)
----@class ValidateSpec
----@field [1] any
----@field [2] vim.validate.Validator
----@field [3]? boolean
----@field [4]? string
-
----@class DirectionFuncs
----@field r fun(t: table<string, any>): table<string, any>
----@field l fun(t: table<string, any>): table<string, any>
+---@module 'which-colorscheme._meta'
 
 local in_list = vim.list_contains
 local ERROR = vim.log.levels.ERROR
@@ -67,34 +58,21 @@ end
 --- ---
 ---@param T table<string, vim.validate.Spec|ValidateSpec>
 function M.validate(T)
-  if not M.vim_has('nvim-0.11') then
-    ---Filter table to fit legacy standard
-    ---@cast T table<string, vim.validate.Spec>
-    for name, spec in pairs(T) do
-      while #spec > 3 do
-        table.remove(spec, #spec)
-      end
-
-      T[name] = spec
-    end
-
-    vim.validate(T)
-    return
-  end
-
-  ---Filter table to fit non-legacy standard
-  ---@cast T table<string, ValidateSpec>
+  local max = M.vim_has('nvim-0.11') and 4 or 3
   for name, spec in pairs(T) do
-    while #spec > 4 do
+    while #spec > max do
       table.remove(spec, #spec)
     end
-
     T[name] = spec
   end
 
   for name, spec in pairs(T) do
-    table.insert(spec, 1, name)
-    vim.validate(unpack(spec))
+    if M.vim_has('nvim-0.11') then
+      table.insert(spec, 1, name)
+      vim.validate(unpack(spec))
+    else
+      vim.validate(spec)
+    end
   end
 end
 
@@ -155,17 +133,15 @@ function M.displace_letter(c, direction)
   local String = require('which-colorscheme.util.string')
   local A = vim.deepcopy(String.alphabet)
   local LOWER, UPPER = A.lower_map, A.upper_map
-
   if not (in_list(vim.tbl_keys(LOWER), c) or in_list(vim.tbl_keys(UPPER), c)) then
     return 'a'
   end
 
-  local d = direction == 'prev' and 'r' or 'l' ---@type 'r'|'l'
-
+  local d = direction == 'prev' and 'r' or 'l'
   if in_list(vim.tbl_keys(LOWER), c) then
-    return M.mv_tbl_values(LOWER, 1, d)[c]
+    return M.mv_tbl_values(LOWER, nil, d)[c]
   end
-  return M.mv_tbl_values(UPPER, 1, d)[c]
+  return M.mv_tbl_values(UPPER, nil, d)[c]
 end
 
 ---@param T table<string|integer, any>
@@ -214,7 +190,6 @@ function M.randomize_list(T)
   if not vim.islist(T) then
     error('Table is not a list!', ERROR)
   end
-
   if vim.tbl_isempty(T) then
     return T
   end
@@ -231,11 +206,12 @@ function M.randomize_list(T)
 end
 
 ---@param T table<string, any>
----@param steps? integer
----@param direction? 'l'|'r'
+---@param steps integer
+---@param direction 'l'|'r'
 ---@return table<string, any> res
 ---@overload fun(T: table<string, any>): res: table<string, any>
 ---@overload fun(T: table<string, any>, steps: integer): res: table<string, any>
+---@overload fun(T: table<string, any>, steps?: integer, direction: 'l'|'r'): res: table<string, any>
 function M.mv_tbl_values(T, steps, direction)
   M.validate({
     T = { T, { 'table' } },
@@ -327,6 +303,8 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
+---@overload fun(char: string[], str: string): new_str: string
+---@overload fun(char: string, str: string): new_str: string
 function M.lstrip(char, str)
   M.validate({
     char = { char, { 'string', 'table' } },
@@ -367,6 +345,8 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
+---@overload fun(char: string[], str: string): new_str: string
+---@overload fun(char: string, str: string): new_str: string
 function M.rstrip(char, str)
   M.validate({
     char = { char, { 'string', 'table' } },
@@ -401,6 +381,8 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
+---@overload fun(char: string[], str: string): new_str: string
+---@overload fun(char: string, str: string): new_str: string
 function M.strip(char, str)
   M.validate({
     char = { char, { 'string', 'table' } },

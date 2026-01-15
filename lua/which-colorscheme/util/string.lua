@@ -1,58 +1,6 @@
-local in_list = vim.list_contains
+---@module 'which-colorscheme._meta'
 
----@alias Letter
----|'a'
----|'b'
----|'c'
----|'d'
----|'e'
----|'f'
----|'g'
----|'h'
----|'i'
----|'j'
----|'k'
----|'l'
----|'m'
----|'n'
----|'o'
----|'p'
----|'q'
----|'r'
----|'s'
----|'t'
----|'u'
----|'v'
----|'w'
----|'x'
----|'y'
----|'z'
----|'A'
----|'B'
----|'C'
----|'D'
----|'E'
----|'F'
----|'G'
----|'H'
----|'I'
----|'J'
----|'K'
----|'L'
----|'M'
----|'N'
----|'O'
----|'P'
----|'Q'
----|'R'
----|'S'
----|'T'
----|'U'
----|'V'
----|'W'
----|'X'
----|'Y'
----|'Z'
+local in_list = vim.list_contains
 
 ---@class WhichColorscheme.Util.String
 local M = {}
@@ -177,20 +125,18 @@ M.alphabet = {
   },
   ---@class WhichColorscheme.Util.String.Alphabet.Vowels
   vowels = {
-    ---@class WhichColorscheme.Util.String.Alphabet.Vowels.UpperList
-    upper_list = { 'A', 'E', 'I', 'O', 'U' },
-    ---@class WhichColorscheme.Util.String.Alphabet.Vowels.LowerList
-    lower_list = { 'a', 'e', 'i', 'o', 'u' },
-    ---@class WhichColorscheme.Util.String.Alphabet.Vowels.UpperMap
+    upper_list = { 'A', 'E', 'I', 'O', 'U' }, ---@type { [1]: 'A', [2]: 'E', [3]: 'I', [4]: 'O', [5]: 'U' }
+    lower_list = { 'a', 'e', 'i', 'o', 'u' }, ---@type { [1]: 'a', [2]: 'e', [3]: 'i', [4]: 'o', [5]: 'u' }
+    ---@enum UpperVowel
     upper_map = { A = 'A', E = 'E', I = 'I', O = 'O', U = 'U' },
-    ---@class WhichColorscheme.Util.String.Alphabet.Vowels.LowerMap
+    ---@enum LowerVowel
     lower_map = { a = 'a', e = 'e', i = 'i', o = 'o', u = 'u' },
   },
 }
 
 ---@class WhichColorscheme.Util.String.Digits
 M.digits = {
-  ---@class WhichColorscheme.Util.String.Digits.All
+  ---@enum AllDigits
   all = {
     ['0'] = '0',
     ['1'] = '1',
@@ -203,20 +149,21 @@ M.digits = {
     ['8'] = '8',
     ['9'] = '9',
   },
-  ---@class WhichColorscheme.Util.String.Digits.OddList
-  odd_list = { '1', '3', '5', '7', '9' },
-  ---@class WhichColorscheme.Util.String.Digits.EvenList
-  even_list = { '0', '2', '4', '6', '8' },
-  ---@class WhichColorscheme.Util.String.Digits.EvenMap
+  odd_list = { '1', '3', '5', '7', '9' }, ---@type { [1]: '1', [2]: '3', [3]: '5', [4]: '7', [5]: '9' }
+  even_list = { '0', '2', '4', '6', '8' }, ---@type { [1]: '0', [2]: '2', [3]: '4', [4]: '6', [5]: '8' }
+  ---@enum EvenDigits
   even_map = { ['0'] = '0', ['2'] = '2', ['4'] = '4', ['6'] = '6', ['8'] = '8' },
-  ---@class WhichColorscheme.Util.String.Digits.OddMap
+  ---@enum OddDigits
   odd_map = { ['1'] = '1', ['3'] = '3', ['5'] = '5', ['7'] = '7', ['9'] = '9' },
 }
 
 ---@param str string
----@param use_dot? boolean
----@param triggers? string[]
+---@param use_dot boolean
+---@param triggers string[]
 ---@return string new_str
+---@overload fun(str: string): new_str: string
+---@overload fun(str: string, use_dot: boolean): new_str: string
+---@overload fun(str: string, use_dot?: boolean, triggers: string[]): new_str: string
 function M.capitalize(str, use_dot, triggers)
   require('which-colorscheme.util').validate({
     str = { str, { 'string' } },
@@ -230,9 +177,8 @@ function M.capitalize(str, use_dot, triggers)
   use_dot = use_dot ~= nil and use_dot or false
   triggers = vim.tbl_deep_extend('force', triggers or {}, { ' ', '' })
 
-  local strlen = str:len()
+  local strlen, dot = str:len(), true
   local prev_char, new_str, i = '', '', 1
-  local dot = true
   while i <= strlen do
     local char = str:sub(i, i)
     if char == char:lower() and in_list(triggers, prev_char) then
@@ -260,6 +206,7 @@ end
 ---@param str string
 ---@param target string
 ---@param new string
+---@return string new_str
 function M.replace(str, target, new)
   require('which-colorscheme.util').validate({
     str = { str, { 'string' } },

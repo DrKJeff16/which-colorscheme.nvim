@@ -11,7 +11,7 @@ function M.check()
   end
   vim.health.ok('`which-key.nvim` installed!')
 
-  if vim.g.WhichColorscheme_setup ~= 1 then
+  if vim.g.which_colorscheme_setup ~= 1 then
     vim.health.error('`which-colorscheme.nvim` has not been setup correctly!')
     return
   end
