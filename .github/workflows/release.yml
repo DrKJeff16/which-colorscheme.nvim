@@ -19,7 +19,7 @@ jobs:
       - name: Build Project Assets
         run: |
           mkdir -pv which-colorscheme.nvim
-          cp -rv lua README.md LICENSE Makefile which-colorscheme.nvim
+          cp -rv doc lua README.md LICENSE Makefile which-colorscheme.nvim
           zip -r -9 which-colorscheme.nvim.zip which-colorscheme.nvim
           tar cvJf which-colorscheme.nvim.tar.xz which-colorscheme.nvim
           tar cvzf which-colorscheme.nvim.tar.gz which-colorscheme.nvim
