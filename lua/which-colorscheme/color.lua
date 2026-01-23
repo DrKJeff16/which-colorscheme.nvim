@@ -4,11 +4,13 @@ local Util = require('which-colorscheme.util')
 local M = {}
 
 ---@return string current
+---@nodiscard
 function M.get_current()
   return vim.api.nvim_exec2('colorscheme', { output = true }).output
 end
 
 ---@return string[] colorschemes
+---@nodiscard
 function M.calculate_colorschemes()
   local colorschemes = vim.fn.getcompletion('', 'color')
   table.sort(colorschemes)
@@ -18,6 +20,7 @@ end
 
 ---@param color string
 ---@return boolean result
+---@nodiscard
 function M.is_color(color)
   Util.validate({ color = { color, { 'string' } } })
 
@@ -26,10 +29,11 @@ end
 
 ---@param colors string[]
 ---@return string[] colorschemes
+---@nodiscard
 function M.remove_builtins(colors)
   Util.validate({ colors = { colors, { 'table' } } })
 
-  local builtins = {
+  local builtins = { ---@type string[]
     'blue',
     'darkblue',
     'default',

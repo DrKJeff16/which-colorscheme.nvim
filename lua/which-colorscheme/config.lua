@@ -21,16 +21,12 @@ function M.get_defaults()
     group_name = 'Colorschemes',
     include_builtin = false,
     custom_groups = {},
-    grouping = {
-      uppercase_groups = false,
-      random = false,
-      inverse = false,
-      current_first = true,
-    },
+    grouping = { uppercase_groups = false, random = false, inverse = false, current_first = true },
   }
 end
 
----@param opts? WhichColorschemeOpts
+---@param opts WhichColorschemeOpts
+---@overload fun()
 function M.setup(opts)
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
