@@ -138,18 +138,15 @@ function M.displace_letter(c, direction)
   direction = direction or 'next'
   direction = in_list({ 'next', 'prev' }, direction) and direction or 'next'
 
-  local String = require('which-colorscheme.util.string')
-  local A = vim.deepcopy(String.alphabet)
-  local LOWER, UPPER = A.lower_map, A.upper_map
-  if not (in_list(vim.tbl_keys(LOWER), c) or in_list(vim.tbl_keys(UPPER), c)) then
+  local A = vim.deepcopy(require('which-colorscheme.util.string').alphabet)
+  ---@type string[], string[]
+  local LOWER_K, UPPER_K = vim.tbl_keys(A.lower_map), vim.tbl_keys(A.upper_map)
+  if not (in_list(LOWER_K, c) or in_list(UPPER_K, c)) then
     return 'a'
   end
 
   local d = direction == 'prev' and 'r' or 'l'
-  if in_list(vim.tbl_keys(LOWER), c) then
-    return M.mv_tbl_values(LOWER, nil, d)[c]
-  end
-  return M.mv_tbl_values(UPPER, nil, d)[c]
+  return M.mv_tbl_values(in_list(LOWER_K, c) and A.lower_map or A.upper_map, 0, d)[c]
 end
 
 ---@param T table<string|integer, any>
@@ -217,7 +214,7 @@ function M.randomize_list(T)
 end
 
 ---@param T table<string, any>
----@param steps integer|nil
+---@param steps integer
 ---@param direction 'l'|'r'
 ---@return table<string, any> res
 ---@overload fun(T: table<string, any>): res: table<string, any>
@@ -226,7 +223,7 @@ end
 function M.mv_tbl_values(T, steps, direction)
   M.validate({
     T = { T, { 'table' } },
-    steps = { steps, { 'number', 'nil' }, true },
+    steps = { steps, { 'number' } },
     direction = { direction, { 'string', 'nil' }, true },
   })
   steps = (steps and steps > 0 and M.is_int(steps)) and steps or 1

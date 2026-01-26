@@ -9,10 +9,9 @@ local in_list = vim.list_contains
 ---@class WhichColorscheme.Config
 ---@field config WhichColorschemeOpts
 ---@field manually_set string[]
----@field maps WhichColorschemeGroups
-local M = {
-  maps = {},
-}
+local M = {}
+
+M.maps = {} ---@type WhichColorschemeGroups
 
 ---@return WhichColorschemeOpts defaults
 function M.get_defaults()
@@ -54,13 +53,11 @@ function M.generate_maps(colors, group)
     colors = { colors, { 'table' } },
     group = { group, { 'string' } },
   })
-
   if not M.config.custom_groups then
     return
   end
 
-  M.maps = {}
-  M.manually_set = {}
+  M.maps, M.manually_set = {}, {}
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
@@ -109,6 +106,7 @@ function M.map()
     error('which-key.nvim is not installed!', ERROR)
   end
   if vim.g.which_colorscheme_setup ~= 1 then
+    vim.notify('`which-colorscheme.nvim` has not been setup!', ERROR)
     return
   end
 
