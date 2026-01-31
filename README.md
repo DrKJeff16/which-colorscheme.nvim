@@ -69,6 +69,8 @@ The default setup options are the following:
 
 ### Custom Grouping
 
+https://github.com/user-attachments/assets/53e72f8e-71cc-4cf8-9a6c-5927b3fb7fad
+
 If you wish to order your colorschemes manually you can use the `custom_groups` option:
 
 ```lua
@@ -82,9 +84,9 @@ require('which-colorscheme').setup({
 })
 ```
 
-https://github.com/user-attachments/assets/53e72f8e-71cc-4cf8-9a6c-5927b3fb7fad
-
 ### Labeling
+
+![Labeling](https://github.com/user-attachments/assets/e782f65d-7802-4e72-9430-c637e7be283d)
 
 You can add custom group names to any desired group section:
 
