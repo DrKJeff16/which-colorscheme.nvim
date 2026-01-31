@@ -20,7 +20,13 @@ function M.get_defaults()
     group_name = 'Colorschemes',
     include_builtin = false,
     custom_groups = {},
-    grouping = { uppercase_groups = false, random = false, inverse = false, current_first = true },
+    grouping = {
+      labels = {},
+      uppercase_groups = false,
+      random = false,
+      inverse = false,
+      current_first = true,
+    },
   }
 end
 
@@ -134,7 +140,13 @@ function M.map()
   local prefix = M.config.prefix or '<leader>c' ---@type string
   local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
   for group, category in pairs(M.maps) do
-    table.insert(keys, { prefix .. group, group = 'Group ' .. group })
+    local g = (M.config.grouping.labels[group] and M.config.grouping.labels[group] ~= '')
+        and M.config.grouping.labels[group]
+      or ('Group %s'):format(group)
+
+    g = Util.strip(' ', g) ~= '' and Util.strip(' ', g) or ('Group %s'):format(group)
+
+    table.insert(keys, { prefix .. group, group = Util.strip(' ', g) })
     for i, color in ipairs(category) do
       table.insert(keys, {
         ('%s%s%s'):format(prefix, group, i),

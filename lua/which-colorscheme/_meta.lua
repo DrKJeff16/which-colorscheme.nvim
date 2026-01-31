@@ -26,21 +26,76 @@
 
 ---@alias WhichColorschemeGroups table <string, WhichColorschemeGroup>
 
----@class WhichColorschemeGroupping
+---@class WhichColorschemeGrouping.Labels
+---@field a? string
+---@field b? string
+---@field c? string
+---@field d? string
+---@field e? string
+---@field f? string
+---@field g? string
+---@field h? string
+---@field i? string
+---@field j? string
+---@field k? string
+---@field l? string
+---@field m? string
+---@field n? string
+---@field o? string
+---@field p? string
+---@field q? string
+---@field r? string
+---@field s? string
+---@field t? string
+---@field u? string
+---@field v? string
+---@field w? string
+---@field x? string
+---@field y? string
+---@field z? string
+---@field A? string
+---@field B? string
+---@field C? string
+---@field D? string
+---@field E? string
+---@field F? string
+---@field G? string
+---@field H? string
+---@field I? string
+---@field J? string
+---@field K? string
+---@field L? string
+---@field M? string
+---@field N? string
+---@field O? string
+---@field P? string
+---@field Q? string
+---@field R? string
+---@field S? string
+---@field T? string
+---@field U? string
+---@field V? string
+---@field W? string
+---@field X? string
+---@field Y? string
+---@field Z? string
+
+---@class WhichColorschemeGrouping
 ---@field uppercase_groups? boolean
 ---@field random? boolean
 ---@field inverse? boolean
 ---@field current_first? boolean
+---@field labels? WhichColorschemeGrouping.Labels|table<Letter, string>
 
 ---@class WhichColorschemeOpts
 ---@field prefix? string
 ---@field group_name? string
 ---@field include_builtin? boolean
----@field grouping? WhichColorschemeGroupping
+---@field grouping? WhichColorschemeGrouping
 ---@field custom_groups? WhichColorschemeGroups
 
 ---@enum (key) Letter
-local Letter = {
+local Letter = { ---@diagnostic disable-line:unused-local
   a = 1,
   b = 1,
   c = 1,

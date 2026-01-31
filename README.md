@@ -58,6 +58,7 @@ The default setup options are the following:
   include_builtin = false, -- Whether to include the built-in Neovim colorschemes
   custom_groups = {}, -- Custom groups for colorschemes (see the `Custom Groups` section below)
   grouping = {
+    labels = {}, -- The labels assigned to a given group (see the `Labeling` section below)
     uppercase_groups = false, -- Whether to use uppercase groups for keymaps
     random = false, -- Whether to randomize the mappings
     inverse = false, -- Whether to map your colorschemes from z-a (if random is `true`, this does nothing)
@@ -82,6 +83,24 @@ require('which-colorscheme').setup({
 ```
 
 https://github.com/user-attachments/assets/53e72f8e-71cc-4cf8-9a6c-5927b3fb7fad
+
+### Labeling
+
+You can add custom group names to any desired group section:
+
+```lua
+require('which-colorscheme').setup({
+  grouping = {
+    labels = {
+      A = 'Favorites',
+      B = '', -- The default `B` group name will be used
+      C = '    ', -- The default `C` group name will be used
+      E = 'Extras', -- The `D` group will fall back to its default value
+      F = '    Foo   ', -- Will be stripped down to `Foo`
+    },
+  },
+})
+```
 
 ---
 
