@@ -30,8 +30,7 @@ function M.get_defaults()
   }
 end
 
----@param opts WhichColorschemeOpts
----@overload fun()
+---@param opts? WhichColorschemeOpts
 function M.setup(opts)
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 

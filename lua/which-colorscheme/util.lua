@@ -180,9 +180,8 @@ function M.dedup(T)
 end
 
 ---@param c string
----@param direction 'next'|'prev'
+---@param direction? 'next'|'prev'
 ---@return string letter
----@overload fun(c: string): letter: string
 ---@nodiscard
 function M.displace_letter(c, direction)
   M.validate({
@@ -268,11 +267,9 @@ function M.randomize_list(T)
 end
 
 ---@param T table<string, any>
----@param steps integer
----@param direction 'l'|'r'
+---@param steps? integer
+---@param direction? 'l'|'r'
 ---@return table<string, any> res
----@overload fun(T: table<string, any>): res: table<string, any>
----@overload fun(T: table<string, any>, steps: integer|nil): res: table<string, any>
 ---@nodiscard
 function M.mv_tbl_values(T, steps, direction)
   M.validate({
@@ -294,24 +291,23 @@ end
 ---Checks if module `mod` exists to be imported.
 --- ---
 ---@param mod string The `require()` argument to be checked
----@param ret boolean Whether to return the called module
+---@param return_mod? boolean Whether to return the called module
 ---@return boolean exists A boolean indicating whether the module exists or not
----@return unknown module
----@overload fun(mod: string): exists: boolean
+---@return unknown? module
 ---@nodiscard
-function M.mod_exists(mod, ret)
+function M.mod_exists(mod, return_mod)
   M.validate({
     mod = { mod, { 'string' } },
-    ret = { ret, { 'boolean', 'nil' }, true },
+    return_mod = { return_mod, { 'boolean', 'nil' }, true },
   })
-  ret = ret ~= nil and ret or false
+  return_mod = return_mod ~= nil and return_mod or false
 
   if mod == '' then
     return false
   end
   local exists, module = pcall(require, mod)
 
-  if ret then
+  if return_mod then
     return exists, module
   end
 
@@ -343,8 +339,6 @@ end
 
 ---@param exe string[]|string
 ---@return boolean is_executable
----@overload fun(exe: string): is_executable: boolean
----@overload fun(exe: string[]): is_executable: boolean
 ---@nodiscard
 function M.executable(exe)
   M.validate({ exe = { exe, { 'string', 'table' } } })
@@ -371,8 +365,6 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
----@overload fun(char: string, str: string): new_str: string
----@overload fun(char: string[], str: string): new_str: string
 ---@nodiscard
 function M.lstrip(char, str)
   M.validate({
@@ -380,7 +372,7 @@ function M.lstrip(char, str)
     str = { str, { 'string' } },
   })
 
-  if str == '' or not vim.startswith(str, char) then
+  if str == '' or not vim.startswith(str, char) or char:len() > str:len() then
     return str
   end
 
@@ -414,8 +406,6 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
----@overload fun(char: string, str: string): new_str: string
----@overload fun(char: string[], str: string): new_str: string
 ---@nodiscard
 function M.rstrip(char, str)
   M.validate({
@@ -451,8 +441,6 @@ end
 ---@param char string[]|string
 ---@param str string
 ---@return string new_str
----@overload fun(char: string, str: string): new_str: string
----@overload fun(char: string[], str: string): new_str: string
 ---@nodiscard
 function M.strip(char, str)
   M.validate({
