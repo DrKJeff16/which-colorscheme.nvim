@@ -1,8 +1,5 @@
 ---@module 'which-colorscheme._meta'
 
-local in_list = vim.list_contains
-local ERROR = vim.log.levels.ERROR
-
 local direction_funcs = { ---@type DirectionFuncs
   r = function(t)
     local keys = vim.tbl_keys(t) ---@type string[]
@@ -28,6 +25,63 @@ local direction_funcs = { ---@type DirectionFuncs
 
 ---@class WhichColorscheme.Util
 local M = {}
+
+---@param t type
+---@param data nil|number|string|boolean|table|function
+---@param sep? string
+---@param constraints? string[]
+---@return string
+---@return boolean|nil
+---@nodiscard
+function M.format_per_type(t, data, sep, constraints)
+  M.validate({
+    t = { t, { 'string' } },
+    sep = { sep, { 'string', 'nil' }, true },
+    constraints = { constraints, { 'table', 'nil' }, true },
+  })
+  sep = sep or ''
+  constraints = constraints or nil
+
+  if t == 'string' then
+    local res = ('%s`"%s"`'):format(sep, data)
+    if not M.is_type('table', constraints) then
+      return res
+    end
+    if constraints ~= nil and vim.list_contains(constraints, data) then
+      return res
+    end
+    return res, true
+  end
+  if vim.list_contains({ 'number', 'boolean' }, t) then
+    return ('%s`%s`'):format(sep, tostring(data))
+  end
+  if t == 'function' then
+    return ('%s`%s`'):format(sep, t)
+  end
+
+  local msg = ''
+  if t == 'nil' then
+    return ('%s%s `nil`'):format(sep, msg)
+  end
+  if t ~= 'table' then
+    return ('%s%s `?`'):format(sep, msg)
+  end
+  if vim.tbl_isempty(data) then
+    return ('%s%s `{}`'):format(sep, msg)
+  end
+
+  sep = ('%s '):format(sep)
+  for k, v in pairs(data) do
+    k = M.is_type('number', k) and ('[%s]'):format(tostring(k)) or k
+    msg = ('%s\n%s`%s`: '):format(msg, sep, k)
+    if not M.is_type('string', v) then
+      msg = ('%s%s'):format(msg, M.format_per_type(type(v), v, sep))
+    else
+      msg = ('%s`"%s"`'):format(msg, v)
+    end
+  end
+  return msg
+end
 
 ---@param feature string
 ---@return boolean has
@@ -103,7 +157,7 @@ function M.dedup(T)
     return T
   end
   if not vim.islist(T) then
-    error('Table is not list-like!', ERROR)
+    error('Table is not list-like!', vim.log.levels.ERROR)
   end
 
   local NT = {} ---@type any[]
@@ -116,7 +170,7 @@ function M.dedup(T)
       end, { predicate = true })
     else
       ---@cast v any
-      not_dup = not in_list(NT, v)
+      not_dup = not vim.list_contains(NT, v)
     end
     if not_dup then
       table.insert(NT, v)
@@ -136,17 +190,17 @@ function M.displace_letter(c, direction)
     direction = { direction, { 'string', 'nil' }, true },
   })
   direction = direction or 'next'
-  direction = in_list({ 'next', 'prev' }, direction) and direction or 'next'
+  direction = vim.list_contains({ 'next', 'prev' }, direction) and direction or 'next'
 
   local A = vim.deepcopy(require('which-colorscheme.util.string').alphabet)
   ---@type string[], string[]
   local LOWER_K, UPPER_K = vim.tbl_keys(A.lower_map), vim.tbl_keys(A.upper_map)
-  if not (in_list(LOWER_K, c) or in_list(UPPER_K, c)) then
+  if not (vim.list_contains(LOWER_K, c) or vim.list_contains(UPPER_K, c)) then
     return 'a'
   end
 
   local d = direction == 'prev' and 'r' or 'l'
-  return M.mv_tbl_values(in_list(LOWER_K, c) and A.lower_map or A.upper_map, 0, d)[c]
+  return M.mv_tbl_values(vim.list_contains(LOWER_K, c) and A.lower_map or A.upper_map, 0, d)[c]
 end
 
 ---@param T table<string|integer, any>
@@ -196,7 +250,7 @@ end
 function M.randomize_list(T)
   M.validate({ T = { T, { 'table' } } })
   if not vim.islist(T) then
-    error('Table is not a list!', ERROR)
+    error('Table is not a list!', vim.log.levels.ERROR)
   end
   if vim.tbl_isempty(T) then
     return T
@@ -206,7 +260,7 @@ function M.randomize_list(T)
   local len = #T
   while #new_list < len do
     local item = T[math.random(1, len)]
-    if not in_list(new_list, item) then
+    if not vim.list_contains(new_list, item) then
       table.insert(new_list, item)
     end
   end
@@ -227,7 +281,7 @@ function M.mv_tbl_values(T, steps, direction)
     direction = { direction, { 'string', 'nil' }, true },
   })
   steps = (steps and steps > 0 and M.is_int(steps)) and steps or 1
-  direction = (direction and in_list({ 'l', 'r' }, direction)) and direction or 'r'
+  direction = (direction and vim.list_contains({ 'l', 'r' }, direction)) and direction or 'r'
 
   local res, func = T, direction_funcs[direction]
   while steps > 0 do
