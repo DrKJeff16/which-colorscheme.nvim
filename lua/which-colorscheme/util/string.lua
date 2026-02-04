@@ -156,24 +156,20 @@ M.digits = {
 }
 
 ---@param str string
----@param use_dot boolean
----@param triggers string[]
+---@param use_dot? boolean
+---@param triggers? string[]
 ---@return string new_str
----@overload fun(str: string): new_str: string
----@overload fun(str: string, use_dot: boolean): new_str: string
----@overload fun(str: string, use_dot?: boolean, triggers: string[]): new_str: string
 function M.capitalize(str, use_dot, triggers)
   require('which-colorscheme.util').validate({
     str = { str, { 'string' } },
     use_dot = { use_dot, { 'boolean', 'nil' }, true },
     triggers = { triggers, { 'table', 'nil' }, true },
   })
+  use_dot = use_dot ~= nil and use_dot or false
+  triggers = vim.tbl_deep_extend('force', triggers or {}, { ' ', '' })
   if str == '' then
     return str
   end
-
-  use_dot = use_dot ~= nil and use_dot or false
-  triggers = vim.tbl_deep_extend('force', triggers or {}, { ' ', '' })
 
   local strlen, dot = str:len(), true
   local prev_char, new_str, i = '', '', 1
