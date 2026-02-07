@@ -63,6 +63,7 @@ function M.generate_maps(colors, group)
   end
 
   M.maps, M.manually_set = {}, {}
+  M.new_colors = {} ---@type string[]
 
   local excluded = M.config.excluded or {}
   for custom_group, category in pairs(M.config.custom_groups) do
@@ -71,13 +72,13 @@ function M.generate_maps(colors, group)
       if Color.is_color(color) then
         if not (in_list(M.manually_set, color) or in_list(excluded, color)) then
           table.insert(M.manually_set, color)
+          table.insert(M.new_colors, color)
           table.insert(M.maps[custom_group], color)
         end
       end
     end
   end
 
-  M.new_colors = {} ---@type string[]
   for _, color in ipairs(colors) do
     if not (in_list(M.manually_set, color) or in_list(excluded, color)) then
       table.insert(M.new_colors, color)
