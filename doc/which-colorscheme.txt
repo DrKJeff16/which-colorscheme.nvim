@@ -17,6 +17,8 @@ TABLE OF CONTENTS                        *which-colorscheme-table-of-contents*
     - |which-colorscheme-luarocks|
 - |which-colorscheme-configuration|
     - |which-colorscheme-custom-grouping|
+    - |which-colorscheme-labeling|
+    - |which-colorscheme-excluding-colorschemes|
 - |which-colorscheme-license|
 
 ------------------------------------------------------------------------------
