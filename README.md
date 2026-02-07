@@ -12,6 +12,8 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
   - [LuaRocks](#luarocks)
 - [Configuration](#configuration)
   - [Custom Grouping](#custom-grouping)
+  - [Labeling](#labeling)
+  - [Excluding Colorschemes](#excluding-colorschemes)
 - [License](#license)
 
 ---
