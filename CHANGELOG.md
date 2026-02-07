@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.1-1](https://github.com/DrKJeff16/which-colorscheme.nvim/tree/v0.2.1-1) (2026-02-07)
+
+[Full Changelog](https://github.com/DrKJeff16/which-colorscheme.nvim/compare/v0.2.0-1...v0.2.1-1)
+
 ## [v0.2.0-1](https://github.com/DrKJeff16/which-colorscheme.nvim/tree/v0.2.0-1) (2026-01-31)
 
 [Full Changelog](https://github.com/DrKJeff16/which-colorscheme.nvim/compare/v0.1.1-1...v0.2.0-1)
