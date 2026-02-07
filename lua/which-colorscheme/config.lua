@@ -79,7 +79,7 @@ function M.generate_maps(colors, group)
 
   M.new_colors = {} ---@type string[]
   for _, color in ipairs(colors) do
-    if not in_list(M.manually_set, color) then
+    if not (in_list(M.manually_set, color) or in_list(excluded, color)) then
       table.insert(M.new_colors, color)
     end
   end
@@ -93,7 +93,13 @@ function M.generate_maps(colors, group)
     if not M.maps[group] then
       M.maps[group] = {}
     end
-    if not (M.maps[group][i] and in_list(colors, M.maps[group][i])) then
+    if
+      not (
+        M.maps[group][i]
+        and in_list(colors, M.maps[group][i])
+        and in_list(excluded, M.maps[group][i])
+      )
+    then
       local color = M.new_colors[idx]
       if not (in_list(M.new_colors, M.maps[group][i]) or in_list(M.manually_set, color)) then
         M.maps[group][i] = color
