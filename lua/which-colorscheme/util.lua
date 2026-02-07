@@ -114,7 +114,7 @@ end
 --- ---
 ---@param T table<string, vim.validate.Spec|ValidateSpec>
 function M.validate(T)
-  local max = M.vim_has('nvim-0.11') and 4 or 3
+  local max = M.vim_has('nvim-0.11') and 3 or 4
   for name, spec in pairs(T) do
     while #spec > max do
       table.remove(spec, #spec)
@@ -122,14 +122,15 @@ function M.validate(T)
     T[name] = spec
   end
 
-  for name, spec in pairs(T) do
-    if max == 4 then
+  if M.vim_has('nvim-0.11') then
+    for name, spec in pairs(T) do
       table.insert(spec, 1, name)
       vim.validate(unpack(spec))
-    else
-      vim.validate(spec)
     end
+    return
   end
+
+  vim.validate(T)
 end
 
 ---Checks whether nvim is running on Windows.
