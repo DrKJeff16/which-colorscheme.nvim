@@ -20,6 +20,7 @@ function M.get_defaults()
     group_name = 'Colorschemes',
     include_builtin = false,
     custom_groups = {},
+    excluded = {},
     grouping = {
       labels = {},
       uppercase_groups = false,
@@ -33,9 +34,8 @@ end
 ---@param opts? WhichColorschemeOpts
 function M.setup(opts)
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
-
   if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!')
+    error('which-key.nvim is not installed!', ERROR)
   end
 
   M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
@@ -63,12 +63,16 @@ function M.generate_maps(colors, group)
   end
 
   M.maps, M.manually_set = {}, {}
+
+  local excluded = M.config.excluded or {}
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if Color.is_color(color) and not in_list(M.manually_set, color) then
-        table.insert(M.manually_set, color)
-        table.insert(M.maps[custom_group], color)
+      if Color.is_color(color) then
+        if not (in_list(M.manually_set, color) or in_list(excluded, color)) then
+          table.insert(M.manually_set, color)
+          table.insert(M.maps[custom_group], color)
+        end
       end
     end
   end

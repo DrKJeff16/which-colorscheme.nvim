@@ -57,6 +57,7 @@ The default setup options are the following:
   group_name = 'Colorschemes', -- The prefix group in `which-key.nvim`
   include_builtin = false, -- Whether to include the built-in Neovim colorschemes
   custom_groups = {}, -- Custom groups for colorschemes (see the `Custom Groups` section below)
+  excluded = {}, -- List of colorscheme names/variants to ignore
   grouping = {
     labels = {}, -- The labels assigned to a given group (see the `Labeling` section below)
     uppercase_groups = false, -- Whether to use uppercase groups for keymaps
@@ -102,6 +103,50 @@ require('which-colorscheme').setup({
     },
   },
 })
+```
+
+### Excluding Colorschemes
+
+You can ignore any colorscheme variant you'd like. For example, let's say we want to ignore
+the light colorscheme variants, plus some built-in ones:
+
+```lua
+require('which-colorscheme').setup({
+  excluded = {
+    -- Built-in
+    'blue',
+    'darkblue',
+
+    -- tokyonight
+    'tokyonight-day',
+
+    -- catppuccin
+    'catppuccin-latte',
+
+    -- nightfox
+    'dawnfox',
+    'dayfox',
+
+    -- kanagawa
+    'kanagawa-lotus',
+
+    -- teide
+    'teide-light',
+  },
+})
+```
+
+Note that you'll need to know the name of the colorscheme to begin with
+(the one you use in the `:colorscheme` command).
+
+You can see all the colorschemes listed either by using a picker that supports it
+(e.g. `:Telescope colorscheme` for telescope).
+
+Alternatively you can run this in your command line:
+
+```vim
+" This will print out all the installed colorschemes
+:lua vim.print(vim.fn.getcompletion('', 'color'))
 ```
 
 ---

@@ -93,6 +93,7 @@
 ---@field include_builtin? boolean
 ---@field grouping? WhichColorschemeGrouping
 ---@field custom_groups? WhichColorschemeGroups
+---@field excluded? string[]
 
 ---@enum (key) Letter
 local Letter = { ---@diagnostic disable-line:unused-local
