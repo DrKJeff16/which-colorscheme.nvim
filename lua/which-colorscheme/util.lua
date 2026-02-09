@@ -278,7 +278,7 @@ function M.mv_tbl_values(T, steps, direction)
     steps = { steps, { 'number' } },
     direction = { direction, { 'string', 'nil' }, true },
   })
-  steps = (steps and steps > 0 and M.is_int(steps)) and steps or 1
+  steps = (steps and M.is_int(steps, steps > 0)) and steps or 1
   direction = (direction and vim.list_contains({ 'l', 'r' }, direction)) and direction or 'r'
 
   local res, func = T, direction_funcs[direction]
@@ -318,12 +318,18 @@ end
 ---Checks if a given number is type integer.
 --- ---
 ---@param num number
+---@param cond? boolean
 ---@return boolean int
 ---@nodiscard
-function M.is_int(num)
-  M.validate({ num = { num, { 'number' } } })
+function M.is_int(num, cond)
+  M.validate({
+    num = { num, { 'number' } },
+    cond = { cond, { 'boolean', 'nil' }, true },
+  })
+  cond = cond ~= nil and cond or true
 
-  return math.floor(num) == num and math.ceil(num) == num
+  local is_int = math.floor(num) == num and math.ceil(num) == num
+  return is_int and cond
 end
 
 ---Checks whether `data` is of type `t` or not.
