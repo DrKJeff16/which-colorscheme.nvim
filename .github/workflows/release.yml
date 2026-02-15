@@ -20,12 +20,12 @@ jobs:
         run: |
           mkdir -pv which-colorscheme.nvim
           cp -rv doc lua README.md LICENSE Makefile which-colorscheme.nvim
-          zip -r -9 which-colorscheme.nvim.zip which-colorscheme.nvim
           tar cvJf which-colorscheme.nvim.tar.xz which-colorscheme.nvim
           tar cvzf which-colorscheme.nvim.tar.gz which-colorscheme.nvim
-          sha512sum which-colorscheme.nvim.zip which-colorscheme.nvim.tar.xz which-colorscheme.nvim.tar.gz >| sha512sums.txt
-          md5sum which-colorscheme.nvim.zip which-colorscheme.nvim.tar.xz which-colorscheme.nvim.tar.gz >| md5sums.txt
-          rm -rfv which-colorscheme.nvim
+          zip -r -9 which-colorscheme.nvim.zip which-colorscheme.nvim
+          7z a -mx9 -mmt -sdel which-colorscheme.nvim.7z which-colorscheme.nvim
+          sha512sum which-colorscheme.nvim.7z which-colorscheme.nvim.zip which-colorscheme.nvim.tar.xz which-colorscheme.nvim.tar.gz >| sha512sums.txt
+          md5sum which-colorscheme.nvim.7z which-colorscheme.nvim.zip which-colorscheme.nvim.tar.xz which-colorscheme.nvim.tar.gz >| md5sums.txt
       - name: Get Release
         uses: joutvhu/get-release@v1.0.3
         with:
@@ -46,9 +46,10 @@ jobs:
         with:
           files: |
             Release.txt
+            md5sums.txt
+            sha512sums.txt
+            which-colorscheme.nvim.7z
             which-colorscheme.nvim.tar.gz
             which-colorscheme.nvim.tar.xz
             which-colorscheme.nvim.zip
-            md5sums.txt
-            sha512sums.txt
           token: ${{ secrets.GITHUB_TOKEN }}
