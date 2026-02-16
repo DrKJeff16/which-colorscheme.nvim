@@ -1,4 +1,5 @@
 ---@meta
+---@diagnostic disable:unused-local
 
 ---Non-legacy validation spec (>=v0.11)
 ---@class ValidateSpec
@@ -96,7 +97,7 @@
 ---@field excluded? string[]
 
 ---@enum (key) Letter
-local Letter = { ---@diagnostic disable-line:unused-local
+local Letter = {
   a = 1,
   b = 1,
   c = 1,
@@ -150,5 +151,4 @@ local Letter = { ---@diagnostic disable-line:unused-local
   Y = 1,
   Z = 1,
 }
-
 -- vim: set ts=2 sts=2 sw=2 et ai si sta:

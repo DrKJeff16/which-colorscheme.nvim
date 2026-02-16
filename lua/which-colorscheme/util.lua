@@ -26,8 +26,9 @@ local direction_funcs = { ---@type DirectionFuncs
 ---@class WhichColorscheme.Util
 local M = {}
 
+---@generic T: any
 ---@param t type
----@param data nil|number|string|boolean|table|function
+---@param data T
 ---@param sep? string
 ---@param constraints? string[]
 ---@return string
@@ -90,9 +91,10 @@ function M.vim_has(feature)
   return vim.fn.has(feature) == 1
 end
 
----@param T any[]
+---@generic T: string
+---@param T T[]
 ---@param item string|number|boolean
----@return any[] T
+---@return T[] T
 ---@nodiscard
 function M.move_start(T, item)
   M.validate({
@@ -148,8 +150,9 @@ end
 ---If the data passed to the function is not a table,
 ---an error will be raised.
 --- ---
----@param T any[]
----@return any[] NT
+---@generic T
+---@param T T[]
+---@return T[] NT
 ---@nodiscard
 function M.dedup(T)
   M.validate({ T = { T, { 'table' } } })
@@ -214,7 +217,7 @@ function M.get_dict_size(T)
   end
 
   local len = 0
-  for _, _ in pairs(T) do
+  for _ in pairs(T) do
     len = len + 1
   end
   return len
@@ -227,8 +230,9 @@ end
 ---If the data passed to the function is not a table,
 ---an error will be raised.
 --- ---
----@param T (string|number|boolean)[]
----@return (string|number|boolean)[] T
+---@generic T
+---@param T T[]
+---@return T[] T
 ---@nodiscard
 function M.reverse(T)
   M.validate({ T = { T, { 'table' } } })
@@ -244,8 +248,9 @@ function M.reverse(T)
   return T
 end
 
----@param T (string|number)[]
----@return (string|number)[] new_list
+---@generic T
+---@param T T[]
+---@return T[] new_list
 ---@nodiscard
 function M.randomize_list(T)
   M.validate({ T = { T, { 'table' } } })
@@ -336,8 +341,9 @@ end
 ---
 ---If `data` is `nil`, the function will always return `false`.
 --- ---
+---@generic T: any
 ---@param t type Any return value the `type()` function would return
----@param data any The data to be type-checked
+---@param data T The data to be type-checked
 ---@return boolean correct_type
 ---@nodiscard
 function M.is_type(t, data)

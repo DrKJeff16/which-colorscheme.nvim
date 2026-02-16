@@ -33,10 +33,11 @@ end
 
 ---@param opts? WhichColorschemeOpts
 function M.setup(opts)
-  Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
   if not Util.mod_exists('which-key') then
     error('which-key.nvim is not installed!', ERROR)
   end
+
+  Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
   M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
   vim.g.which_colorscheme_setup = 1
@@ -69,12 +70,12 @@ function M.generate_maps(colors, group)
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if Color.is_color(color) then
-        if not (in_list(M.manually_set, color) or in_list(excluded, color)) then
-          table.insert(M.manually_set, color)
-          table.insert(M.new_colors, color)
-          table.insert(M.maps[custom_group], color)
-        end
+      if
+        Color.is_color(color) and not (in_list(M.manually_set, color) or in_list(excluded, color))
+      then
+        table.insert(M.manually_set, color)
+        table.insert(M.new_colors, color)
+        table.insert(M.maps[custom_group], color)
       end
     end
   end
@@ -86,7 +87,7 @@ function M.generate_maps(colors, group)
   end
 
   if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    M.new_colors = Util.move_start(vim.deepcopy(M.new_colors), Color.get_current()) ---@type string[]
+    M.new_colors = Util.move_start(M.new_colors, Color.get_current()) ---@type string[]
   end
 
   local i, idx = 1, 1
@@ -122,27 +123,21 @@ function M.map()
     error('which-key.nvim is not installed!', ERROR)
   end
   if vim.g.which_colorscheme_setup ~= 1 then
-    vim.notify('`which-colorscheme.nvim` has not been setup!', ERROR)
-    return
+    error('`which-colorscheme.nvim` has not been setup!', ERROR)
   end
 
-  local colors = Color.calculate_colorschemes()
-
-  if not M.config.include_builtin then
-    colors = Color.remove_builtins(vim.deepcopy(colors))
-  end
-
+  local colors = Color.calculate_colorschemes(not M.config.include_builtin)
   if M.config.grouping then
     if M.config.grouping.inverse ~= nil and M.config.grouping.inverse then
-      colors = Util.reverse(vim.deepcopy(colors)) ---@type string[]
+      colors = Util.reverse(colors)
     end
     if M.config.grouping.random ~= nil and M.config.grouping.random then
-      colors = Util.randomize_list(vim.deepcopy(colors)) ---@type string[]
+      colors = Util.randomize_list(colors)
     end
   end
 
   if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    colors = Util.move_start(vim.deepcopy(colors), Color.get_current()) ---@type string[]
+    colors = Util.move_start(colors, Color.get_current())
   end
 
   M.generate_maps(colors, M.config.grouping.uppercase_groups and 'A' or 'a')

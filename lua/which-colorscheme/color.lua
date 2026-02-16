@@ -9,10 +9,16 @@ function M.get_current()
   return vim.api.nvim_exec2('colorscheme', { output = true }).output
 end
 
+---@param no_builtins? boolean
 ---@return string[] colorschemes
 ---@nodiscard
-function M.calculate_colorschemes()
+function M.calculate_colorschemes(no_builtins)
+  Util.validate({ no_builtins = { no_builtins, { 'boolean', 'nil' }, true } })
+
   local colorschemes = vim.fn.getcompletion('', 'color')
+  if no_builtins ~= nil and no_builtins then
+    colorschemes = M.remove_builtins(colorschemes)
+  end
   table.sort(colorschemes)
 
   return colorschemes
@@ -64,9 +70,12 @@ function M.remove_builtins(colors)
   }
 
   local colorschemes = {} ---@type string[]
-  for _, color in ipairs(colors) do
-    if not vim.list_contains(builtins, color) then
-      table.insert(colorschemes, color)
+  local i = 1
+  while i < #colors do
+    if vim.list_contains(builtins, colors[i]) then
+      table.remove(colors, i)
+    else
+      i = i + 1
     end
   end
 
