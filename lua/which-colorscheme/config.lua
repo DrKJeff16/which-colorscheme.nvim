@@ -94,17 +94,22 @@ function M.generate_maps(group)
     if not M.maps[group] then
       M.maps[group] = {}
     end
-    local map = M.maps[group][i]
-    if not (map and in_list(M.new_colors, map) and in_list(excluded, map)) then
+    if
+      not (
+        M.maps[group][i]
+        and in_list(M.new_colors, M.maps[group][i])
+        and in_list(excluded, M.maps[group][i])
+      )
+    then
       local color = M.new_colors[idx]
       if not in_list(M.manually_set, color) then
         M.maps[group][i] = color
-        if i == 9 then
-          i = 1
-          group = Util.displace_letter(group)
-        elseif i < 9 then
-          i = i + 1
-        end
+      end
+      if i == 9 then
+        i = 1
+        group = Util.displace_letter(group)
+      elseif i < 9 then
+        i = i + 1
       end
     end
     idx = idx + 1
