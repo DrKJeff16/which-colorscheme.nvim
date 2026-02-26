@@ -1,6 +1,9 @@
 ---@module 'which-colorscheme._meta'
 
-local direction_funcs = { ---@type DirectionFuncs
+---@class WhichColorscheme.Util
+local M = {}
+
+M.direction_funcs = { ---@type DirectionFuncs
   r = function(t)
     local keys = vim.tbl_keys(t) ---@type string[]
     table.sort(keys)
@@ -22,9 +25,6 @@ local direction_funcs = { ---@type DirectionFuncs
     return res
   end,
 }
-
----@class WhichColorscheme.Util
-local M = {}
 
 ---@generic T: any
 ---@param t type
@@ -196,14 +196,14 @@ function M.displace_letter(c, direction)
   direction = vim.list_contains({ 'next', 'prev' }, direction) and direction or 'next'
 
   local A = vim.deepcopy(require('which-colorscheme.util.string').alphabet)
-  ---@type string[], string[]
-  local LOWER_K, UPPER_K = vim.tbl_keys(A.lower_map), vim.tbl_keys(A.upper_map)
+  local LOWER_K, UPPER_K = vim.tbl_keys(A.lower_map), vim.tbl_keys(A.upper_map) ---@type string[], string[]
   if not (vim.list_contains(LOWER_K, c) or vim.list_contains(UPPER_K, c)) then
     return 'a'
   end
 
+  local map = vim.list_contains(LOWER_K, c) and A.lower_map or A.upper_map
   local d = direction == 'prev' and 'r' or 'l'
-  return M.mv_tbl_values(vim.list_contains(LOWER_K, c) and A.lower_map or A.upper_map, 0, d)[c]
+  return M.mv_tbl_values(map, nil, d)[c]
 end
 
 ---@param T table<string|integer, any>
@@ -275,23 +275,23 @@ end
 ---@param T table<string, any>
 ---@param steps? integer
 ---@param direction? 'l'|'r'
----@return table<string, any> res
+---@return table<string, any> T
 ---@nodiscard
 function M.mv_tbl_values(T, steps, direction)
   M.validate({
     T = { T, { 'table' } },
-    steps = { steps, { 'number' } },
+    steps = { steps, { 'number', 'nil' }, true },
     direction = { direction, { 'string', 'nil' }, true },
   })
-  steps = (steps and M.is_int(steps, steps > 0)) and steps or 1
+  steps = (steps and M.is_int(steps)) and steps or 1
   direction = (direction and vim.list_contains({ 'l', 'r' }, direction)) and direction or 'r'
 
-  local res, func = T, direction_funcs[direction]
+  local func = M.direction_funcs[direction]
   while steps > 0 do
-    res = func(res)
+    T = func(T)
     steps = steps - 1
   end
-  return res
+  return T
 end
 
 ---Checks if module `mod` exists to be imported.

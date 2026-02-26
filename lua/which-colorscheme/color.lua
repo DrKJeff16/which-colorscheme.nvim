@@ -1,4 +1,33 @@
 local Util = require('which-colorscheme.util')
+local builtins = { ---@type string[]
+  'blue',
+  'darkblue',
+  'default',
+  'delek',
+  'desert',
+  'elflord',
+  'evening',
+  'habamax',
+  'industry',
+  'koehler',
+  'lunaperche',
+  'morning',
+  'murphy',
+  'pablo',
+  'peachpuff',
+  'quiet',
+  'retrobox',
+  'ron',
+  'shine',
+  'slate',
+  'sorbet',
+  'torte',
+  'unokai',
+  'vim',
+  'wildcharm',
+  'zaibatsu',
+  'zellner',
+}
 
 ---@class WhichColorscheme.Color
 local M = {}
@@ -14,12 +43,19 @@ end
 ---@nodiscard
 function M.calculate_colorschemes(no_builtins)
   Util.validate({ no_builtins = { no_builtins, { 'boolean', 'nil' }, true } })
+  no_builtins = no_builtins ~= nil and no_builtins or false
 
   local colorschemes = vim.fn.getcompletion('', 'color')
-  if no_builtins ~= nil and no_builtins then
-    colorschemes = M.remove_builtins(colorschemes)
+  if no_builtins then
+    local colors = {} ---@type string[]
+    for _, color in ipairs(colorschemes) do
+      if not vim.list_contains(builtins, color) then
+        table.insert(colors, color)
+      end
+    end
+
+    colorschemes = colors
   end
-  table.sort(colorschemes)
 
   return colorschemes
 end
@@ -31,55 +67,6 @@ function M.is_color(color)
   Util.validate({ color = { color, { 'string' } } })
 
   return vim.list_contains(vim.fn.getcompletion('', 'color'), color)
-end
-
----@param colors string[]
----@return string[] colorschemes
----@nodiscard
-function M.remove_builtins(colors)
-  Util.validate({ colors = { colors, { 'table' } } })
-
-  local builtins = { ---@type string[]
-    'blue',
-    'darkblue',
-    'default',
-    'delek',
-    'desert',
-    'elflord',
-    'evening',
-    'habamax',
-    'industry',
-    'koehler',
-    'lunaperche',
-    'morning',
-    'murphy',
-    'pablo',
-    'peachpuff',
-    'quiet',
-    'retrobox',
-    'ron',
-    'shine',
-    'slate',
-    'sorbet',
-    'torte',
-    'unokai',
-    'vim',
-    'wildcharm',
-    'zaibatsu',
-    'zellner',
-  }
-
-  local colorschemes = {} ---@type string[]
-  local i = 1
-  while i < #colors do
-    if vim.list_contains(builtins, colors[i]) then
-      table.remove(colors, i)
-    else
-      i = i + 1
-    end
-  end
-
-  return colorschemes
 end
 
 return M

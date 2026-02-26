@@ -12,6 +12,7 @@ local in_list = vim.list_contains
 local M = {}
 
 M.maps = {} ---@type WhichColorschemeGroups
+M.colors = {} ---@type string[]
 
 ---@return WhichColorschemeOpts defaults
 function M.get_defaults()
@@ -52,11 +53,9 @@ function M.setup(opts)
   })
 end
 
----@param colors string[]
 ---@param group Letter
-function M.generate_maps(colors, group)
+function M.generate_maps(group)
   Util.validate({
-    colors = { colors, { 'table' } },
     group = { group, { 'string' } },
   })
   if not M.config.custom_groups then
@@ -70,18 +69,18 @@ function M.generate_maps(colors, group)
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if
-        Color.is_color(color) and not (in_list(M.manually_set, color) or in_list(excluded, color))
-      then
-        table.insert(M.manually_set, color)
+      if Color.is_color(color) and not in_list(excluded, color) then
+        if not in_list(M.manually_set, color) then
+          table.insert(M.manually_set, color)
+        end
         table.insert(M.new_colors, color)
         table.insert(M.maps[custom_group], color)
       end
     end
   end
 
-  for _, color in ipairs(colors) do
-    if not (in_list(M.manually_set, color) or in_list(excluded, color)) then
+  for _, color in ipairs(M.colors) do
+    if not (in_list(excluded, color) or in_list(M.new_colors, color)) then
       table.insert(M.new_colors, color)
     end
   end
@@ -95,26 +94,20 @@ function M.generate_maps(colors, group)
     if not M.maps[group] then
       M.maps[group] = {}
     end
-    if
-      not (
-        M.maps[group][i]
-        and in_list(colors, M.maps[group][i])
-        and in_list(excluded, M.maps[group][i])
-      )
-    then
+    local map = M.maps[group][i]
+    if not (map and in_list(M.new_colors, map) and in_list(excluded, map)) then
       local color = M.new_colors[idx]
-      if not (in_list(M.new_colors, M.maps[group][i]) or in_list(M.manually_set, color)) then
+      if not in_list(M.manually_set, color) then
         M.maps[group][i] = color
+        if i == 9 then
+          i = 1
+          group = Util.displace_letter(group)
+        elseif i < 9 then
+          i = i + 1
+        end
       end
     end
     idx = idx + 1
-
-    if i == 9 then
-      i = 1
-      group = Util.displace_letter(group)
-    elseif i < 9 then
-      i = i + 1
-    end
   end
 end
 
@@ -126,21 +119,21 @@ function M.map()
     error('`which-colorscheme.nvim` has not been setup!', ERROR)
   end
 
-  local colors = Color.calculate_colorschemes(not M.config.include_builtin)
+  M.colors = Color.calculate_colorschemes(not M.config.include_builtin)
   if M.config.grouping then
     if M.config.grouping.inverse ~= nil and M.config.grouping.inverse then
-      colors = Util.reverse(colors)
+      M.colors = Util.reverse(M.colors)
     end
     if M.config.grouping.random ~= nil and M.config.grouping.random then
-      colors = Util.randomize_list(colors)
+      M.colors = Util.randomize_list(M.colors)
     end
   end
 
   if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    colors = Util.move_start(colors, Color.get_current())
+    M.colors = Util.move_start(M.colors, Color.get_current())
   end
 
-  M.generate_maps(colors, M.config.grouping.uppercase_groups and 'A' or 'a')
+  M.generate_maps(M.config.grouping.uppercase_groups and 'A' or 'a')
 
   local prefix = M.config.prefix or '<leader>c' ---@type string
   local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
