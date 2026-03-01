@@ -95,6 +95,7 @@
 ---@field grouping? WhichColorschemeGrouping
 ---@field custom_groups? WhichColorschemeGroups
 ---@field excluded? string[]
+---@field custom_only? boolean
 
 ---@enum (key) Letter
 local Letter = {

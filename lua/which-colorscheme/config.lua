@@ -20,6 +20,7 @@ function M.get_defaults()
     prefix = '<leader>C',
     group_name = 'Colorschemes',
     include_builtin = false,
+    custom_only = false,
     custom_groups = {},
     excluded = {},
     grouping = {
@@ -54,10 +55,13 @@ function M.setup(opts)
 end
 
 ---@param group Letter
-function M.generate_maps(group)
+---@param custom_only? boolean
+function M.generate_maps(group, custom_only)
   Util.validate({
     group = { group, { 'string' } },
+    custom_only = { custom_only, { 'boolean', 'nil' }, true },
   })
+  custom_only = custom_only ~= nil and custom_only or false
   if not M.config.custom_groups then
     return
   end
@@ -69,19 +73,21 @@ function M.generate_maps(group)
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if Color.is_color(color) and not in_list(excluded, color) then
-        if not in_list(M.manually_set, color) then
-          table.insert(M.manually_set, color)
-        end
+      if
+        Color.is_color(color) and not (in_list(excluded, color) or in_list(M.manually_set, color))
+      then
+        table.insert(M.manually_set, color)
         table.insert(M.new_colors, color)
         table.insert(M.maps[custom_group], color)
       end
     end
   end
 
-  for _, color in ipairs(M.colors) do
-    if not (in_list(excluded, color) or in_list(M.new_colors, color)) then
-      table.insert(M.new_colors, color)
+  if not custom_only or vim.tbl_isempty(M.manually_set) then
+    for _, color in ipairs(M.colors) do
+      if not (in_list(excluded, color) or in_list(M.new_colors, color)) then
+        table.insert(M.new_colors, color)
+      end
     end
   end
 
@@ -138,7 +144,7 @@ function M.map()
     M.colors = Util.move_start(M.colors, Color.get_current())
   end
 
-  M.generate_maps(M.config.grouping.uppercase_groups and 'A' or 'a')
+  M.generate_maps(M.config.grouping.uppercase_groups and 'A' or 'a', M.config.custom_only)
 
   local prefix = M.config.prefix or '<leader>c' ---@type string
   local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec

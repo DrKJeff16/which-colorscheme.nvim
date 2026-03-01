@@ -58,6 +58,8 @@ The default setup options are the following:
   prefix = '<leader>C', -- The prefix to your keymap
   group_name = 'Colorschemes', -- The prefix group in `which-key.nvim`
   include_builtin = false, -- Whether to include the built-in Neovim colorschemes
+  -- NOTE: If `custom_groups` is empty this will be ignored
+  custom_only = false, -- Whether to only map the colorschemes defined in `custom_groups`
   custom_groups = {}, -- Custom groups for colorschemes (see the `Custom Groups` section below)
   excluded = {}, -- List of colorscheme names/variants to ignore
   grouping = {
