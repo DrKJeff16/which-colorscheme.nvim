@@ -11,8 +11,8 @@
 ---@alias DirectionFunc fun(t: table<string, any>): new_direction: table<string, any>
 
 ---@class DirectionFuncs
----@field r DirectionFunc
 ---@field l DirectionFunc
+---@field r DirectionFunc
 
 ---@class WhichColorschemeGroup
 ---@field [1]? string
@@ -28,32 +28,6 @@
 ---@alias WhichColorschemeGroups table <string, WhichColorschemeGroup>
 
 ---@class WhichColorschemeGrouping.Labels
----@field a? string
----@field b? string
----@field c? string
----@field d? string
----@field e? string
----@field f? string
----@field g? string
----@field h? string
----@field i? string
----@field j? string
----@field k? string
----@field l? string
----@field m? string
----@field n? string
----@field o? string
----@field p? string
----@field q? string
----@field r? string
----@field s? string
----@field t? string
----@field u? string
----@field v? string
----@field w? string
----@field x? string
----@field y? string
----@field z? string
 ---@field A? string
 ---@field B? string
 ---@field C? string
@@ -80,6 +54,32 @@
 ---@field X? string
 ---@field Y? string
 ---@field Z? string
+---@field a? string
+---@field b? string
+---@field c? string
+---@field d? string
+---@field e? string
+---@field f? string
+---@field g? string
+---@field h? string
+---@field i? string
+---@field j? string
+---@field k? string
+---@field l? string
+---@field m? string
+---@field n? string
+---@field o? string
+---@field p? string
+---@field q? string
+---@field r? string
+---@field s? string
+---@field t? string
+---@field u? string
+---@field v? string
+---@field w? string
+---@field x? string
+---@field y? string
+---@field z? string
 
 ---@class WhichColorschemeGrouping
 ---@field uppercase_groups? boolean
@@ -89,13 +89,14 @@
 ---@field labels? WhichColorschemeGrouping.Labels|table<Letter, string>
 
 ---@class WhichColorschemeOpts
----@field prefix? string
----@field group_name? string
----@field include_builtin? boolean
----@field grouping? WhichColorschemeGrouping
 ---@field custom_groups? WhichColorschemeGroups
----@field excluded? string[]
 ---@field custom_only? boolean
+---@field description_prefix? string
+---@field excluded? string[]
+---@field group_name? string
+---@field grouping? WhichColorschemeGrouping
+---@field include_builtin? boolean
+---@field prefix? string
 
 ---@enum (key) Letter
 local Letter = {

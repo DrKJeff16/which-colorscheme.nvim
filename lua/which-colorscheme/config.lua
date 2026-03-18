@@ -19,6 +19,7 @@ function M.get_defaults()
   return { ---@type WhichColorschemeOpts
     prefix = '<leader>C',
     group_name = 'Colorschemes',
+    description_prefix = '',
     include_builtin = false,
     custom_only = false,
     custom_groups = {},
@@ -38,20 +39,21 @@ function M.setup(opts)
   if not Util.mod_exists('which-key') then
     error('which-key.nvim is not installed!', ERROR)
   end
-
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
   M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
-  vim.g.which_colorscheme_setup = 1
 
-  M.map()
-
+  local map = vim.schedule_wrap(M.map)
   vim.api.nvim_create_autocmd('ColorScheme', {
     group = vim.api.nvim_create_augroup('WhichColorscheme', { clear = true }),
+    desc = 'which-colorscheme.nvim hook to randomize the keymaps if enabled in setup',
     callback = function()
-      M.map()
+      map()
     end,
   })
+
+  vim.g.which_colorscheme_setup = 1
+  map()
 end
 
 ---@param group Letter
@@ -66,8 +68,7 @@ function M.generate_maps(group, custom_only)
     return
   end
 
-  M.maps, M.manually_set = {}, {}
-  M.new_colors = {} ---@type string[]
+  M.maps, M.manually_set, M.new_colors = {}, {}, {}
 
   local excluded = M.config.excluded or {}
   for custom_group, category in pairs(M.config.custom_groups) do
@@ -92,7 +93,7 @@ function M.generate_maps(group, custom_only)
   end
 
   if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    M.new_colors = Util.move_start(M.new_colors, Color.get_current()) ---@type string[]
+    M.new_colors = Util.move_start(M.new_colors, Color.get_current()) --[[@as string[]\]]
   end
 
   local i, idx = 1, 1
@@ -107,9 +108,8 @@ function M.generate_maps(group, custom_only)
         and in_list(excluded, M.maps[group][i])
       )
     then
-      local color = M.new_colors[idx]
-      if not in_list(M.manually_set, color) then
-        M.maps[group][i] = color
+      if not in_list(M.manually_set, M.new_colors[idx]) then
+        M.maps[group][i] = M.new_colors[idx]
       end
       if i == 9 then
         i = 1
@@ -146,7 +146,7 @@ function M.map()
 
   M.generate_maps(M.config.grouping.uppercase_groups and 'A' or 'a', M.config.custom_only)
 
-  local prefix = M.config.prefix or '<leader>c' ---@type string
+  local prefix = M.config.prefix or '<leader>c' --[[@as string]]
   local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
   for group, category in pairs(M.maps) do
     local g = (M.config.grouping.labels[group] and M.config.grouping.labels[group] ~= '')
@@ -162,7 +162,7 @@ function M.map()
         function()
           vim.cmd.colorscheme(color)
         end,
-        desc = ('Set `%s`'):format(color),
+        desc = ('%s %s'):format(M.config.description_prefix or '', color),
         mode = 'n',
       })
     end
