@@ -124,15 +124,15 @@ function M.validate(T)
     T[name] = spec
   end
 
-  if vim.fn.has('nvim-0.11') == 1 then
-    for name, spec in pairs(T) do
-      table.insert(spec, 1, name)
-      vim.validate(unpack(spec))
-    end
+  if max == 3 then
+    vim.validate(T)
     return
   end
 
-  vim.validate(T)
+  for name, spec in pairs(T) do
+    table.insert(spec, 1, name)
+    vim.validate(unpack(spec))
+  end
 end
 
 ---Checks whether nvim is running on Windows.
@@ -306,7 +306,9 @@ function M.mod_exists(mod, return_mod)
     mod = { mod, { 'string' } },
     return_mod = { return_mod, { 'boolean', 'nil' }, true },
   })
-  return_mod = return_mod ~= nil and return_mod or false
+  if return_mod == nil then
+    return_mod = false
+  end
 
   if mod == '' then
     return false
@@ -331,7 +333,9 @@ function M.is_int(num, cond)
     num = { num, { 'number' } },
     cond = { cond, { 'boolean', 'nil' }, true },
   })
-  cond = cond ~= nil and cond or true
+  if cond == nil then
+    cond = true
+  end
 
   local is_int = math.floor(num) == num and math.ceil(num) == num
   return is_int and cond

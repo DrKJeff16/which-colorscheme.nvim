@@ -15,6 +15,7 @@ M.maps = {} ---@type WhichColorschemeGroups
 M.colors = {} ---@type string[]
 
 ---@return WhichColorschemeOpts defaults
+---@nodiscard
 function M.get_defaults()
   return { ---@type WhichColorschemeOpts
     prefix = '<leader>C',
@@ -42,6 +43,7 @@ function M.setup(opts)
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
   M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
+  vim.g.which_colorscheme_setup = 1
 
   local map = vim.schedule_wrap(M.map)
   vim.api.nvim_create_autocmd('ColorScheme', {
@@ -52,7 +54,6 @@ function M.setup(opts)
     end,
   })
 
-  vim.g.which_colorscheme_setup = 1
   map()
 end
 
@@ -63,7 +64,9 @@ function M.generate_maps(group, custom_only)
     group = { group, { 'string' } },
     custom_only = { custom_only, { 'boolean', 'nil' }, true },
   })
-  custom_only = custom_only ~= nil and custom_only or false
+  if custom_only == nil then
+    custom_only = false
+  end
   if not M.config.custom_groups then
     return
   end
@@ -154,8 +157,8 @@ function M.map()
       or ('Group %s'):format(group)
 
     g = Util.strip(' ', g) ~= '' and Util.strip(' ', g) or ('Group %s'):format(group)
-
     table.insert(keys, { prefix .. group, group = Util.strip(' ', g) })
+
     for i, color in ipairs(category) do
       table.insert(keys, {
         ('%s%s%s'):format(prefix, group, i),

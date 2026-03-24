@@ -43,7 +43,9 @@ end
 ---@nodiscard
 function M.calculate_colorschemes(no_builtins)
   Util.validate({ no_builtins = { no_builtins, { 'boolean', 'nil' }, true } })
-  no_builtins = no_builtins ~= nil and no_builtins or false
+  if no_builtins == nil then
+    no_builtins = true
+  end
 
   local colorschemes = vim.fn.getcompletion('', 'color')
   if no_builtins then
@@ -53,10 +55,8 @@ function M.calculate_colorschemes(no_builtins)
         table.insert(colors, color)
       end
     end
-
     colorschemes = colors
   end
-
   return colorschemes
 end
 
