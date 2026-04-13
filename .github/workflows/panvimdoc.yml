@@ -15,9 +15,9 @@ jobs:
     name: pandoc to vimdoc
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
       - name: Run panvimdoc
-        uses: kdheepak/panvimdoc@main
+        uses: kdheepak/panvimdoc@4.0.1
         with:
           vimdoc: which-colorscheme
           pandoc: README.md
