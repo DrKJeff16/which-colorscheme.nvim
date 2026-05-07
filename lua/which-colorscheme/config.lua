@@ -77,9 +77,7 @@ function M.generate_maps(group, custom_only)
   for custom_group, category in pairs(M.config.custom_groups) do
     M.maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if
-        Color.is_color(color) and not (in_list(excluded, color) or in_list(M.manually_set, color))
-      then
+      if Color.is_color(color) and not (in_list(excluded, color) or in_list(M.manually_set, color)) then
         table.insert(M.manually_set, color)
         table.insert(M.new_colors, color)
         table.insert(M.maps[custom_group], color)
@@ -104,13 +102,7 @@ function M.generate_maps(group, custom_only)
     if not M.maps[group] then
       M.maps[group] = {}
     end
-    if
-      not (
-        M.maps[group][i]
-        and in_list(M.new_colors, M.maps[group][i])
-        and in_list(excluded, M.maps[group][i])
-      )
-    then
+    if not (M.maps[group][i] and in_list(M.new_colors, M.maps[group][i]) and in_list(excluded, M.maps[group][i])) then
       if not in_list(M.manually_set, M.new_colors[idx]) then
         M.maps[group][i] = M.new_colors[idx]
       end
