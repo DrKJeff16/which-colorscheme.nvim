@@ -1,4 +1,4 @@
-*which-colorscheme.txt*      For NVIM >=v0.9.0      Last change: 2026 March 01
+*which-colorscheme.txt*       For NVIM >=v0.9.0       Last change: 2026 May 07
 
 ==============================================================================
 1. which-colorscheme.nvim           *which-colorscheme-which-colorscheme.nvim*
@@ -25,15 +25,15 @@ TABLE OF CONTENTS                        *which-colorscheme-table-of-contents*
 
 INSTALLATION                                  *which-colorscheme-installation*
 
-**Requirements**:
+**Requirements**
 
-- Neovim >= v0.9.0
+- Neovim>= v0.9.0
 - `which-key.nvim` <https://github.com/folke/which-key.nvim>
 
 `folke/lazy.nvim` <https://github.com/folke/lazy.nvim> is highly recommended to
 install this plugin!
 
-**IMPORTANT**: Load `which-key.nvim` and all your colorschemes BEFORE you load
+**IMPORTANT**Load `which-key.nvim` and all your colorschemes BEFORE you load
 this plugin!
 
 >lua
@@ -49,7 +49,7 @@ this plugin!
 LUAROCKS ~
 
 You can also install this through LuaRocks
-<https://luarocks.org/modules/drkjeff16/which-colorscheme.nvim>:
+<https://luarocks.org/modules/drkjeff16/which-colorscheme.nvim>
 
 >bash
     luarocks install which-colorscheme.nvim # Global install
@@ -60,7 +60,7 @@ You can also install this through LuaRocks
 
 CONFIGURATION                                *which-colorscheme-configuration*
 
-The default setup options are the following:
+Thedefault setup options are the following:
 
 >lua
     {
