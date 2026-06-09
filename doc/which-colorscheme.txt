@@ -1,4 +1,4 @@
-*which-colorscheme.txt*       For NVIM >=v0.9.0       Last change: 2026 May 07
+*which-colorscheme.txt*       For NVIM >=v0.9.0      Last change: 2026 June 09
 
 ==============================================================================
 1. which-colorscheme.nvim           *which-colorscheme-which-colorscheme.nvim*
