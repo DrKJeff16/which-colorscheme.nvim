@@ -1,6 +1,7 @@
 ---@module 'which-colorscheme._meta'
 
 ---@class WhichColorscheme.Util
+---@field color WhichColorscheme.Util.String
 local M = {}
 
 M.direction_funcs = { ---@type DirectionFuncs
@@ -494,5 +495,14 @@ function M.strip(char, str)
   return M.rstrip(char, M.lstrip(char, str))
 end
 
-return M
+local Util = setmetatable(M, { ---@type WhichColorscheme.Util
+  __index = function(self, k)
+    if M.mod_exists('which-colorscheme.util.' .. k) then
+      return require('which-colorscheme.util.' .. k)
+    end
+    return rawget(self, k) or nil
+  end,
+})
+
+return Util
 -- vim: set ts=2 sts=2 sw=2 et ai si sta:
