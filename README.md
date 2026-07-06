@@ -55,19 +55,40 @@ The default setup options are the following:
 
 ```lua
 {
-  prefix = '<leader>C', -- The prefix to your keymap
-  group_name = 'Colorschemes', -- The prefix group in `which-key.nvim`
-  include_builtin = false, -- Whether to include the built-in Neovim colorschemes
+  -- The prefix to your keymap
+  prefix = '<leader>C',
+
+  -- The prefix group in `which-key.nvim`
+  group_name = 'Colorschemes',
+
+  -- Whether to include the built-in Neovim colorschemes
+  include_builtin = false,
+
+  -- Whether to only map the colorschemes defined in `custom_groups`
   -- NOTE: If `custom_groups` is empty this will be ignored
-  custom_only = false, -- Whether to only map the colorschemes defined in `custom_groups`
-  custom_groups = {}, -- Custom groups for colorschemes (see the `Custom Groups` section below)
-  excluded = {}, -- List of colorscheme names/variants to ignore
+  custom_only = false,
+
+  -- Custom groups for colorschemes (see the `Custom Groups` section below)
+  custom_groups = {},
+
+  -- List of colorscheme names/variants to ignore
+  excluded = {},
+
   grouping = {
-    labels = {}, -- The labels assigned to a given group (see the `Labeling` section below)
-    uppercase_groups = false, -- Whether to use uppercase groups for keymaps
-    random = false, -- Whether to randomize the mappings
-    inverse = false, -- Whether to map your colorschemes from z-a (if random is `true`, this does nothing)
-    current_first = true, -- Whether to put the current colorscheme in the first group
+    -- The labels assigned to a given group (see the `Labeling` section below)
+    labels = {},
+
+    -- Whether to use uppercase groups for keymaps
+    uppercase_groups = false,
+
+    -- Whether to randomize the mappings
+    random = false,
+
+    -- Whether to map your colorschemes from z-a (if random is `true`, this does nothing)
+    inverse = false,
+
+    -- Whether to put the current colorscheme in the first group
+    current_first = true,
   },
 }
 ```
@@ -84,7 +105,7 @@ require('which-colorscheme').setup({
     A = { 'tokyonight', 'tokyonight-storm', 'tokyonight-moon', 'tokyonight-night', 'tokyonight-day' },
     -- Skip section B
     C = { '', 'catppuccin' }, -- Blank strings are ignored
-    D = { 'foo' }, -- If `foo` is not a colorscheme it'll get skipped
+    D = { 'foo' }, -- If `foo` is not a colorscheme it'll be skipped
   },
 })
 ```
