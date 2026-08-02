@@ -64,7 +64,7 @@ The default setup options are the following:
   -- Whether to include the built-in Neovim colorschemes
   include_builtin = false,
 
-  -- Whether to only map the colorschemes defined in `custom_groups`
+  -- Whether to only map the colorschemes defined in `custom_groups`.
   -- NOTE: If `custom_groups` is empty this will be ignored
   custom_only = false,
 
