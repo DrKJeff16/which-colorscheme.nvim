@@ -7,14 +7,24 @@ local Util = require('which-colorscheme.util')
 ---@field util WhichColorscheme.Util
 local M = {}
 
----@param opts? WhichColorschemeOpts
-function M.setup(opts)
-  Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
+M.setup = require('which-colorscheme.config').setup
 
-  require('which-colorscheme.config').setup(opts or {})
+function M.disable()
+  local Config = require('which-colorscheme.config')
+  Config.set('enabled', false)
+  Config.unmap()
+end
+
+function M.enable()
+  local Config = require('which-colorscheme.config')
+  Config.set('enabled', true)
+  Config.map()
 end
 
 local WhichColorscheme = setmetatable(M, { ---@type WhichColorscheme
+  ---@param self WhichColorscheme
+  ---@param k string
+  ---@return any value
   __index = function(self, k)
     if Util.mod_exists('which-colorscheme.' .. k) then
       return require('which-colorscheme.' .. k)

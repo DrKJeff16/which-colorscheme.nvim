@@ -19,7 +19,7 @@ function M.check()
   vim.health.ok('`which-colorscheme.nvim` set up!')
 
   vim.health.start('Config')
-  for k, v in pairs(require('which-colorscheme.config').config) do
+  for k, v in pairs(require('which-colorscheme.config').get()) do
     local str, warning = Util.format_per_type(type(v), v)
     local func = (warning ~= nil and warning) and vim.health.warn or vim.health.ok
     func((' - `%s`: %s'):format(k, str))

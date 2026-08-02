@@ -2,22 +2,22 @@
 
 local Util = require('which-colorscheme.util')
 local Color = require('which-colorscheme.color')
-local WK = require('which-key')
 local ERROR = vim.log.levels.ERROR
 local in_list = vim.list_contains
 
 ---@class WhichColorscheme.Config
----@field config WhichColorschemeOpts
 ---@field manually_set string[]
 local M = {}
 
-M.maps = {} ---@type WhichColorschemeGroups
-M.colors = {} ---@type string[]
+local maps = {} ---@type WhichColorschemeGroups
+local colors = {} ---@type string[]
+local keys = {} ---@type wk.Spec
 
 ---@return WhichColorschemeOpts defaults
 ---@nodiscard
 function M.get_defaults()
   return { ---@type WhichColorschemeOpts
+    enabled = true,
     prefix = '<leader>C',
     group_name = 'Colorschemes',
     description_prefix = '',
@@ -35,6 +35,23 @@ function M.get_defaults()
   }
 end
 
+local options = M.get_defaults()
+
+---@return WhichColorschemeOpts options
+function M.get()
+  return options
+end
+
+---@param k string
+---@param v any
+function M.set(k, v)
+  Util.validate({ k = { k, { 'string' } } })
+
+  if M.get_defaults()[k] then
+    options[k] = v
+  end
+end
+
 ---@param opts? WhichColorschemeOpts
 function M.setup(opts)
   if not Util.mod_exists('which-key') then
@@ -42,19 +59,19 @@ function M.setup(opts)
   end
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
-  M.config = vim.tbl_deep_extend('keep', opts or {}, M.get_defaults())
+  options = vim.tbl_deep_extend('force', M.get_defaults(), opts or {})
   vim.g.which_colorscheme_setup = 1
 
-  local map = vim.schedule_wrap(M.map)
-  vim.api.nvim_create_autocmd('ColorScheme', {
-    group = vim.api.nvim_create_augroup('WhichColorscheme', { clear = true }),
-    desc = 'which-colorscheme.nvim hook to randomize the keymaps if enabled in setup',
-    callback = function()
-      map()
-    end,
-  })
+  if options.enabled then
+    local map = vim.schedule_wrap(M.map)
+    vim.api.nvim_create_autocmd('ColorScheme', {
+      group = vim.api.nvim_create_augroup('WhichColorscheme', { clear = true }),
+      desc = 'which-colorscheme.nvim hook to randomize the keymaps if enabled in setup',
+      callback = map,
+    })
 
-  map()
+    map()
+  end
 end
 
 ---@param group Letter
@@ -67,44 +84,44 @@ function M.generate_maps(group, custom_only)
   if custom_only == nil then
     custom_only = false
   end
-  if not M.config.custom_groups then
+  if not options.custom_groups then
     return
   end
 
-  M.maps, M.manually_set, M.new_colors = {}, {}, {}
+  maps, M.manually_set, M.new_colors = {}, {}, {}
 
-  local excluded = M.config.excluded or {}
-  for custom_group, category in pairs(M.config.custom_groups) do
-    M.maps[custom_group] = {}
+  local excluded = options.excluded or {}
+  for custom_group, category in pairs(options.custom_groups) do
+    maps[custom_group] = {}
     for _, color in ipairs(category) do
       if Color.is_color(color) and not (in_list(excluded, color) or in_list(M.manually_set, color)) then
         table.insert(M.manually_set, color)
         table.insert(M.new_colors, color)
-        table.insert(M.maps[custom_group], color)
+        table.insert(maps[custom_group], color)
       end
     end
   end
 
   if not custom_only or vim.tbl_isempty(M.manually_set) then
-    for _, color in ipairs(M.colors) do
+    for _, color in ipairs(colors) do
       if not (in_list(excluded, color) or in_list(M.new_colors, color)) then
         table.insert(M.new_colors, color)
       end
     end
   end
 
-  if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    M.new_colors = Util.move_start(M.new_colors, Color.get_current()) --[[@as string[]\]]
+  if options.grouping.current_first ~= nil and options.grouping.current_first then
+    M.new_colors = Util.move_start(M.new_colors, Color.current()) --[[@as string[]\]]
   end
 
   local i, idx = 1, 1
   while idx < #M.new_colors do
-    if not M.maps[group] then
-      M.maps[group] = {}
+    if not maps[group] then
+      maps[group] = {}
     end
-    if not (M.maps[group][i] and in_list(M.new_colors, M.maps[group][i]) and in_list(excluded, M.maps[group][i])) then
+    if not (maps[group][i] and in_list(M.new_colors, maps[group][i]) and in_list(excluded, maps[group][i])) then
       if not in_list(M.manually_set, M.new_colors[idx]) then
-        M.maps[group][i] = M.new_colors[idx]
+        maps[group][i] = M.new_colors[idx]
       end
       if i == 9 then
         i = 1
@@ -117,6 +134,25 @@ function M.generate_maps(group, custom_only)
   end
 end
 
+function M.unmap()
+  if not Util.mod_exists('which-key') then
+    error('which-key.nvim is not installed!', ERROR)
+  end
+  if vim.g.which_colorscheme_setup ~= 1 then
+    error('`which-colorscheme.nvim` has not been setup!', ERROR)
+  end
+
+  if vim.tbl_isempty(keys) then
+    return
+  end
+
+  for i, _ in pairs(keys) do
+    keys[i].hidden = true
+  end
+
+  require('which-key').add(keys)
+end
+
 function M.map()
   if not Util.mod_exists('which-key') then
     error('which-key.nvim is not installed!', ERROR)
@@ -125,27 +161,28 @@ function M.map()
     error('`which-colorscheme.nvim` has not been setup!', ERROR)
   end
 
-  M.colors = Color.calculate_colorschemes(not M.config.include_builtin)
-  if M.config.grouping then
-    if M.config.grouping.inverse ~= nil and M.config.grouping.inverse then
-      M.colors = Util.reverse(M.colors)
+  colors = Color.calculate_colorschemes(not options.include_builtin)
+
+  if options.grouping then
+    if options.grouping.inverse ~= nil and options.grouping.inverse then
+      colors = Util.reverse(colors)
     end
-    if M.config.grouping.random ~= nil and M.config.grouping.random then
-      M.colors = Util.randomize_list(M.colors)
+    if options.grouping.random ~= nil and options.grouping.random then
+      colors = Util.randomize_list(colors)
     end
   end
 
-  if M.config.grouping.current_first ~= nil and M.config.grouping.current_first then
-    M.colors = Util.move_start(M.colors, Color.get_current())
+  if options.grouping.current_first ~= nil and options.grouping.current_first then
+    colors = Util.move_start(colors, Color.current())
   end
 
-  M.generate_maps(M.config.grouping.uppercase_groups and 'A' or 'a', M.config.custom_only)
+  M.generate_maps(options.grouping.uppercase_groups and 'A' or 'a', options.custom_only)
 
-  local prefix = M.config.prefix or '<leader>c' --[[@as string]]
-  local keys = { { prefix, group = M.config.group_name or 'Colorschemes' } } ---@type wk.Spec
-  for group, category in pairs(M.maps) do
-    local g = (M.config.grouping.labels[group] and M.config.grouping.labels[group] ~= '')
-        and M.config.grouping.labels[group]
+  local prefix = options.prefix or '<leader>c' --[[@as string]]
+  keys = { { prefix, group = options.group_name or 'Colorschemes' } }
+  for group, category in pairs(maps) do
+    local g = (options.grouping.labels[group] and options.grouping.labels[group] ~= '')
+        and options.grouping.labels[group]
       or ('Group %s'):format(group)
 
     g = Util.strip(' ', g) ~= '' and Util.strip(' ', g) or ('Group %s'):format(group)
@@ -157,13 +194,13 @@ function M.map()
         function()
           vim.cmd.colorscheme(color)
         end,
-        desc = ('%s %s'):format(M.config.description_prefix or '', color),
+        desc = ('%s %s'):format(options.description_prefix or '', color),
         mode = 'n',
       })
     end
   end
 
-  WK.add(keys)
+  require('which-key').add(keys)
 end
 
 return M

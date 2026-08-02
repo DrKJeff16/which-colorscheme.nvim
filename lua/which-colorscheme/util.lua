@@ -115,7 +115,7 @@ end
 
 ---Dynamic `vim.validate()` wrapper which covers both legacy and newer implementations.
 --- ---
----@param T table<string, vim.validate.Spec|ValidateSpec>
+---@param T table<string, vim.validate.Spec|WhichColorscheme.ValidateSpec>
 function M.validate(T)
   local max = vim.fn.has('nvim-0.11') == 1 and 4 or 3
   for name, spec in pairs(T) do
@@ -126,10 +126,12 @@ function M.validate(T)
   end
 
   if max == 3 then
+    ---@cast T vim.validate.Spec
     vim.validate(T)
     return
   end
 
+  ---@cast T WhichColorscheme.ValidateSpec
   for name, spec in pairs(T) do
     table.insert(spec, 1, name)
     vim.validate(unpack(spec))

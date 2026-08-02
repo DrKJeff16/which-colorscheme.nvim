@@ -34,7 +34,7 @@ local M = {}
 
 ---@return string current
 ---@nodiscard
-function M.get_current()
+function M.current()
   return vim.api.nvim_exec2('colorscheme', { output = true }).output
 end
 
