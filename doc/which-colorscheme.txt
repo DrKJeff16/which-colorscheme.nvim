@@ -19,6 +19,7 @@ TABLE OF CONTENTS                        *which-colorscheme-table-of-contents*
     - |which-colorscheme-custom-grouping|
     - |which-colorscheme-labeling|
     - |which-colorscheme-excluding-colorschemes|
+- |which-colorscheme-user-command|
 - |which-colorscheme-license|
 
 ------------------------------------------------------------------------------
@@ -188,7 +189,7 @@ Alternatively you can run this in your command line:
 
 ------------------------------------------------------------------------------
 
-COMMAND                                            *which-colorscheme-command*
+USER COMMAND                                  *which-colorscheme-user-command*
 
 The plugin comes with the `:WhichColorscheme` user command. Usage is as
 follows:
