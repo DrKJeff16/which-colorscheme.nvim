@@ -204,7 +204,7 @@ follows:
 
 LICENSE                                            *which-colorscheme-license*
 
-MIT <./LICENSE>
+GNU GPLv2 <./LICENSE>
 
 ==============================================================================
 2. Links                                             *which-colorscheme-links*
