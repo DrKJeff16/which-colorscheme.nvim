@@ -1,4 +1,4 @@
-*which-colorscheme.txt*      For NVIM >=v0.9.0     Last change: 2026 August 02
+*which-colorscheme.txt*      For NVIM >=v0.9.0     Last change: 2026 August 06
 
 ==============================================================================
 1. which-colorscheme.nvim           *which-colorscheme-which-colorscheme.nvim*
@@ -184,6 +184,19 @@ Alternatively you can run this in your command line:
 >vim
     " This will print out all the installed colorschemes
     :lua vim.print(vim.fn.getcompletion('', 'color'))
+<
+
+------------------------------------------------------------------------------
+
+COMMAND                                            *which-colorscheme-command*
+
+The plugin comes with the `:WhichColorscheme` user command. Usage is as
+follows:
+
+>vim
+    :WhichColorscheme disable " Disable mapping of keys
+    :WhichColorscheme enable  " Enable mapping of keys
+    :WhichColorscheme toggle  " Toggle mapping of keys
 <
 
 ------------------------------------------------------------------------------
