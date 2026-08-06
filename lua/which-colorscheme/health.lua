@@ -1,9 +1,9 @@
-local Util = require('which-colorscheme.util')
-
 ---@class WhichColorscheme.Health
 local M = {}
 
 function M.check()
+  local Util = require('which-colorscheme.util')
+
   vim.health.start('whick-key')
   if not Util.mod_exists('which-key') then
     vim.health.error('`which-key.nvim` is not installed!')

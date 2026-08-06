@@ -1,33 +1,28 @@
-local Util = require('which-colorscheme.util')
-
 ---@class WhichColorscheme
 ---@field color WhichColorscheme.Color
 ---@field config WhichColorscheme.Config
 ---@field health WhichColorscheme.Health
+---@field setup fun(opts?: WhichColorschemeOpts)
 ---@field util WhichColorscheme.Util
 local M = {}
 
-M.setup = require('which-colorscheme.config').setup
-
 function M.disable()
-  local Config = require('which-colorscheme.config')
-  Config.set('enabled', false)
-  Config.unmap()
+  require('which-colorscheme.config').set('enabled', false)
+  require('which-colorscheme.config').unmap()
 end
 
 function M.enable()
-  local Config = require('which-colorscheme.config')
-  Config.set('enabled', true)
-  Config.map()
+  require('which-colorscheme.config').set('enabled', true)
+  require('which-colorscheme.config').map()
 end
 
 local WhichColorscheme = setmetatable(M, { ---@type WhichColorscheme
-  ---@param self WhichColorscheme
-  ---@param k string
-  ---@return any value
   __index = function(self, k)
-    if Util.mod_exists('which-colorscheme.' .. k) then
+    if require('which-colorscheme.util').mod_exists('which-colorscheme.' .. k) then
       return require('which-colorscheme.' .. k)
+    end
+    if k == 'setup' then
+      return require('which-colorscheme.config').setup
     end
     return rawget(self, k) or nil
   end,

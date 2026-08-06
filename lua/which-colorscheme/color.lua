@@ -1,4 +1,3 @@
-local Util = require('which-colorscheme.util')
 local builtins = { ---@type string[]
   'blue',
   'darkblue',
@@ -35,14 +34,14 @@ local M = {}
 ---@return string current
 ---@nodiscard
 function M.current()
-  return vim.api.nvim_exec2('colorscheme', { output = true }).output
+  return vim.g.colors_name --[[@as string]]
 end
 
 ---@param no_builtins? boolean
 ---@return string[] colorschemes
 ---@nodiscard
 function M.calculate_colorschemes(no_builtins)
-  Util.validate({ no_builtins = { no_builtins, { 'boolean', 'nil' }, true } })
+  require('which-colorscheme.util').validate({ no_builtins = { no_builtins, { 'boolean', 'nil' }, true } })
   if no_builtins == nil then
     no_builtins = true
   end
@@ -64,7 +63,7 @@ end
 ---@return boolean result
 ---@nodiscard
 function M.is_color(color)
-  Util.validate({ color = { color, { 'string' } } })
+  require('which-colorscheme.util').validate({ color = { color, { 'string' } } })
 
   return vim.list_contains(vim.fn.getcompletion('', 'color'), color)
 end

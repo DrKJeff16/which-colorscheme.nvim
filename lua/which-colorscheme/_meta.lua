@@ -8,21 +8,6 @@
 ---@field [3]? boolean
 ---@field [4]? string
 
----@alias DirectionFunc fun(t: table<string, any>): new_direction: table<string, any>
-
----@class DirectionFuncs
-local D = {}
-
----@param t table<string, any>
----@return table<string, any>
----@nodiscard
-function D.l(t) end
-
----@param t table<string, any>
----@return table<string, any>
----@nodiscard
-function D.r(t) end
-
 ---@class WhichColorschemeGroup
 ---@field [1]? string
 ---@field [2]? string
@@ -91,17 +76,17 @@ function D.r(t) end
 ---@field z? string
 
 ---@class WhichColorschemeGrouping
----@field uppercase_groups? boolean
----@field random? boolean
----@field inverse? boolean
 ---@field current_first? boolean
+---@field inverse? boolean
 ---@field labels? WhichColorschemeGrouping.Labels|table<Letter, string>
+---@field random? boolean
+---@field uppercase_groups? boolean
 
 ---@class WhichColorschemeOpts
----@field enabled? boolean
 ---@field custom_groups? WhichColorschemeGroups
 ---@field custom_only? boolean
 ---@field description_prefix? string
+---@field enabled? boolean
 ---@field excluded? string[]
 ---@field group_name? string
 ---@field grouping? WhichColorschemeGrouping

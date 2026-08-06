@@ -176,6 +176,18 @@ Alternatively you can run this in your command line:
 
 ---
 
+## Command
+
+The plugin comes with the `:WhichColorscheme` user command. Usage is as follows:
+
+```vim
+:WhichColorscheme disable " Disable mapping of keys
+:WhichColorscheme enable  " Enable mapping of keys
+:WhichColorscheme toggle  " Toggle mapping of keys
+```
+
+---
+
 ## License
 
 [MIT](./LICENSE)
