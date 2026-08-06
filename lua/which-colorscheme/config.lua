@@ -1,41 +1,34 @@
 ---@module 'which-colorscheme._meta'
 
 local Util = require('which-colorscheme.util')
-local Color = require('which-colorscheme.color')
-local ERROR = vim.log.levels.ERROR
-local in_list = vim.list_contains
+
+local colors = {} ---@type string[]
+local keys ---@type wk.Spec
+local maps ---@type WhichColorschemeGroups
+local manually_set = {} ---@type string[]
+local new_colors = {} ---@type string[]
 
 ---@class WhichColorscheme.Config
----@field manually_set string[]
+---@field maps WhichColorschemeGroups
 local M = {}
-
-local maps = {} ---@type WhichColorschemeGroups
-local colors = {} ---@type string[]
-local keys = {} ---@type wk.Spec
 
 ---@return WhichColorschemeOpts defaults
 ---@nodiscard
 function M.get_defaults()
   return { ---@type WhichColorschemeOpts
-    enabled = true,
-    prefix = '<leader>C',
-    group_name = 'Colorschemes',
-    description_prefix = '',
-    include_builtin = false,
-    custom_only = false,
     custom_groups = {},
+    custom_only = false,
+    description_prefix = '',
+    enabled = true,
     excluded = {},
-    grouping = {
-      labels = {},
-      uppercase_groups = false,
-      random = false,
-      inverse = false,
-      current_first = true,
-    },
+    group_name = 'Colorschemes',
+    grouping = { labels = {}, uppercase_groups = false, random = false, inverse = false, current_first = true },
+    include_builtin = false,
+    prefix = '<leader>C',
   }
 end
 
-local options = M.get_defaults()
+local options ---@type WhichColorschemeOpts
 
 ---@return WhichColorschemeOpts options
 function M.get()
@@ -55,7 +48,7 @@ end
 ---@param opts? WhichColorschemeOpts
 function M.setup(opts)
   if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!', ERROR)
+    error('which-key.nvim is not installed!')
   end
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
@@ -67,10 +60,19 @@ function M.setup(opts)
     vim.api.nvim_create_autocmd('ColorScheme', {
       group = vim.api.nvim_create_augroup('WhichColorscheme', { clear = true }),
       desc = 'which-colorscheme.nvim hook to randomize the keymaps if enabled in setup',
-      callback = map,
+      callback = function()
+        if
+          require('which-colorscheme.color').current() ~= vim.g.which_colorscheme_last_color
+          and vim.g.which_colorscheme_enabled == 1
+        then
+          map()
+        end
+      end,
     })
 
     map()
+
+    require('which-colorscheme.commands').create()
   end
 end
 
@@ -88,40 +90,47 @@ function M.generate_maps(group, custom_only)
     return
   end
 
-  maps, M.manually_set, M.new_colors = {}, {}, {}
+  local Color = require('which-colorscheme.color')
+  maps, manually_set, new_colors = {}, {}, {}
 
   local excluded = options.excluded or {}
   for custom_group, category in pairs(options.custom_groups) do
     maps[custom_group] = {}
     for _, color in ipairs(category) do
-      if Color.is_color(color) and not (in_list(excluded, color) or in_list(M.manually_set, color)) then
-        table.insert(M.manually_set, color)
-        table.insert(M.new_colors, color)
+      if
+        Color.is_color(color) and not (vim.list_contains(excluded, color) or vim.list_contains(manually_set, color))
+      then
+        table.insert(manually_set, color)
+        table.insert(new_colors, color)
         table.insert(maps[custom_group], color)
       end
     end
   end
 
-  if not custom_only or vim.tbl_isempty(M.manually_set) then
+  if not custom_only or vim.tbl_isempty(manually_set) then
     for _, color in ipairs(colors) do
-      if not (in_list(excluded, color) or in_list(M.new_colors, color)) then
-        table.insert(M.new_colors, color)
+      if not (vim.list_contains(excluded, color) or vim.list_contains(new_colors, color)) then
+        table.insert(new_colors, color)
       end
     end
   end
 
-  if options.grouping.current_first ~= nil and options.grouping.current_first then
-    M.new_colors = Util.move_start(M.new_colors, Color.current()) --[[@as string[]\]]
+  if options.grouping.current_first then
+    new_colors = Util.move_start(new_colors, Color.current()) --[[@as string[]\]]
   end
 
   local i, idx = 1, 1
-  while idx < #M.new_colors do
-    if not maps[group] then
-      maps[group] = {}
-    end
-    if not (maps[group][i] and in_list(M.new_colors, maps[group][i]) and in_list(excluded, maps[group][i])) then
-      if not in_list(M.manually_set, M.new_colors[idx]) then
-        maps[group][i] = M.new_colors[idx]
+  while idx < #new_colors do
+    maps[group] = maps[group] or {}
+    if
+      not (
+        maps[group][i]
+        and vim.list_contains(new_colors, maps[group][i])
+        and vim.list_contains(excluded, maps[group][i])
+      )
+    then
+      if not vim.list_contains(manually_set, new_colors[idx]) then
+        maps[group][i] = new_colors[idx]
       end
       if i == 9 then
         i = 1
@@ -135,44 +144,49 @@ function M.generate_maps(group, custom_only)
 end
 
 function M.unmap()
-  if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!', ERROR)
-  end
   if vim.g.which_colorscheme_setup ~= 1 then
-    error('`which-colorscheme.nvim` has not been setup!', ERROR)
+    error('`which-colorscheme.nvim` has not been setup!')
+  end
+  if not Util.mod_exists('which-key') then
+    error('which-key.nvim is not installed!')
   end
 
-  if vim.tbl_isempty(keys) then
-    return
+  if not vim.tbl_isempty(keys) then
+    for i in pairs(keys) do
+      keys[i].hidden = true
+    end
+    pcall(require('which-key').add, vim.deepcopy(keys))
+    vim.g.which_colorscheme_enabled = 0
   end
+end
 
-  for i, _ in pairs(keys) do
-    keys[i].hidden = true
-  end
-
-  require('which-key').add(keys)
+---@return wk.Spec keys
+---@nodiscard
+function M.get_keys()
+  return keys
 end
 
 function M.map()
-  if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!', ERROR)
-  end
   if vim.g.which_colorscheme_setup ~= 1 then
-    error('`which-colorscheme.nvim` has not been setup!', ERROR)
+    error('`which-colorscheme.nvim` has not been setup!')
+  end
+  if not Util.mod_exists('which-key') then
+    error('which-key.nvim is not installed!')
   end
 
+  local Color = require('which-colorscheme.color')
   colors = Color.calculate_colorschemes(not options.include_builtin)
 
   if options.grouping then
-    if options.grouping.inverse ~= nil and options.grouping.inverse then
+    if options.grouping.inverse then
       colors = Util.reverse(colors)
     end
-    if options.grouping.random ~= nil and options.grouping.random then
+    if options.grouping.random then
       colors = Util.randomize_list(colors)
     end
   end
 
-  if options.grouping.current_first ~= nil and options.grouping.current_first then
+  if options.grouping.current_first then
     colors = Util.move_start(colors, Color.current())
   end
 
@@ -192,7 +206,7 @@ function M.map()
       table.insert(keys, {
         ('%s%s%s'):format(prefix, group, i),
         function()
-          vim.cmd.colorscheme(color)
+          pcall(vim.cmd.colorscheme, color)
         end,
         desc = ('%s %s'):format(options.description_prefix or '', color),
         mode = 'n',
@@ -200,7 +214,9 @@ function M.map()
     end
   end
 
-  require('which-key').add(keys)
+  pcall(require('which-key').add, vim.deepcopy(keys))
+  vim.g.which_colorscheme_last_color = Color.current()
+  vim.g.which_colorscheme_enabled = 1
 end
 
 return M

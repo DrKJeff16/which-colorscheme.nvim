@@ -4,36 +4,40 @@
 ---@field color WhichColorscheme.Util.String
 local M = {}
 
-M.direction_funcs = { ---@type DirectionFuncs
-  r = function(t)
-    local keys = vim.tbl_keys(t) ---@type string[]
-    table.sort(keys)
+---@class DirectionFuncs
+M.direction_funcs = {}
 
-    local res = {} ---@type table<string, any>
-    for i, v in ipairs(keys) do
-      res[v] = t[keys[i == 1 and #keys or (i - 1)]]
-    end
-    return res
-  end,
-  l = function(t)
-    local keys = vim.tbl_keys(t) ---@type string[]
-    table.sort(keys)
+---@generic T
+---@param t T
+---@return T res
+---@nodiscard
+function M.direction_funcs.r(t)
+  local keys = vim.tbl_keys(t) ---@type string[]
+  table.sort(keys)
 
-    local res = {} ---@type table<string, any>
-    for i, v in ipairs(keys) do
-      res[v] = t[keys[i == #keys and 1 or (i + 1)]]
-    end
-    return res
-  end,
-}
+  local res = {}
+  for i, v in ipairs(keys) do
+    res[v] = t[keys[i == 1 and #keys or (i - 1)]]
+  end
+  return res
+end
+function M.direction_funcs.l(t)
+  local keys = vim.tbl_keys(t) ---@type string[]
+  table.sort(keys)
 
----@generic T: any
+  local res = {} ---@type table<string, any>
+  for i, v in ipairs(keys) do
+    res[v] = t[keys[i == #keys and 1 or (i + 1)]]
+  end
+  return res
+end
+
 ---@param t type
----@param data T
+---@param data any
 ---@param sep? string
 ---@param constraints? string[]
 ---@return string
----@return boolean|nil
+---@return boolean|nil|?
 ---@nodiscard
 function M.format_per_type(t, data, sep, constraints)
   M.validate({
@@ -46,10 +50,7 @@ function M.format_per_type(t, data, sep, constraints)
 
   if t == 'string' then
     local res = ('%s`"%s"`'):format(sep, data)
-    if not M.is_type('table', constraints) then
-      return res
-    end
-    if constraints ~= nil and vim.list_contains(constraints, data) then
+    if not M.is_type('table', constraints) or (constraints and vim.list_contains(constraints, data)) then
       return res
     end
     return res, true
@@ -92,10 +93,10 @@ function M.vim_has(feature)
   return vim.fn.has(feature) == 1
 end
 
----@generic T: string
----@param T T[]
+---@generic T: table
+---@param T T
 ---@param item string|number|boolean
----@return T[] T
+---@return T T
 ---@nodiscard
 function M.move_start(T, item)
   M.validate({
@@ -109,7 +110,6 @@ function M.move_start(T, item)
       table.insert(new_list, v)
     end
   end
-
   return T
 end
 
@@ -128,13 +128,12 @@ function M.validate(T)
   if max == 3 then
     ---@cast T vim.validate.Spec
     vim.validate(T)
-    return
-  end
-
-  ---@cast T WhichColorscheme.ValidateSpec
-  for name, spec in pairs(T) do
-    table.insert(spec, 1, name)
-    vim.validate(unpack(spec))
+  else
+    ---@cast T WhichColorscheme.ValidateSpec
+    for name, spec in pairs(T) do
+      table.insert(spec, 1, name)
+      vim.validate(unpack(spec))
+    end
   end
 end
 
@@ -153,9 +152,9 @@ end
 ---If the data passed to the function is not a table,
 ---an error will be raised.
 --- ---
----@generic T
----@param T T[]
----@return T[] NT
+---@generic T: table
+---@param T T
+---@return T NT
 ---@nodiscard
 function M.dedup(T)
   M.validate({ T = { T, { 'table' } } })
