@@ -14,6 +14,7 @@ https://github.com/user-attachments/assets/c098edd7-fc92-45e4-9312-cecf9f222428
   - [Custom Grouping](#custom-grouping)
   - [Labeling](#labeling)
   - [Excluding Colorschemes](#excluding-colorschemes)
+- [User Command](#user-command)
 - [License](#license)
 
 ---
@@ -176,7 +177,7 @@ Alternatively you can run this in your command line:
 
 ---
 
-## Command
+## User Command
 
 The plugin comes with the `:WhichColorscheme` user command. Usage is as follows:
 
