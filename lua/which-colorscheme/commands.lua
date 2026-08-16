@@ -38,8 +38,8 @@ function M.create()
   end, {
     nargs = 1,
     bar = true,
-    complete = function(_, args)
-      local split = vim.split(args, '%s+', { trimempty = false })
+    complete = function(_, lead) ---@param lead string
+      local split = vim.split(lead, '%s+', { trimempty = false })
       local items = {} ---@type string[]
       if #split == 2 and split[1] == 'WhichColorscheme' then
         for _, option in ipairs(options) do
