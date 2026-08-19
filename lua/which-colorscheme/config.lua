@@ -35,6 +35,11 @@ function M.get()
   return options
 end
 
+---@return string[] colors
+function M.get_colors()
+  return colors
+end
+
 ---@param k string
 ---@param v any
 function M.set(k, v)

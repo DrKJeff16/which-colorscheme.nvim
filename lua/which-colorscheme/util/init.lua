@@ -93,23 +93,26 @@ function M.vim_has(feature)
   return vim.fn.has(feature) == 1
 end
 
----@generic T: table
----@param T T
----@param item string|number|boolean
----@return T T
+---@param T string[]
+---@param item string
+---@return string[] T
 ---@nodiscard
 function M.move_start(T, item)
   M.validate({
     T = { T, { 'table' } },
-    item = { item, { 'string', 'number', 'boolean' } },
+    item = { item, { 'string' } },
   })
 
-  local new_list = { item }
-  for _, v in ipairs(T) do
-    if v ~= item then
-      table.insert(new_list, v)
+  for i = 1, #T do
+    if T[i] == item then
+      table.remove(T, i)
+      break
+    end
+    if i >= 9 then
+      table.remove(T, i)
     end
   end
+  table.insert(T, 1, item)
   return T
 end
 
