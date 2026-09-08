@@ -499,12 +499,26 @@ function M.strip(char, str)
   return M.rstrip(char, M.lstrip(char, str))
 end
 
+---@generic T: table, V
+---@param t T
+---@param k string|integer
+---@param v V
+---@return V v
+function M.rawset(t, k, v)
+  rawset(t, k, v)
+  return v
+end
+
 local Util = setmetatable(M, { ---@type WhichColorscheme.Util
   __index = function(self, k)
-    if M.mod_exists('which-colorscheme.util.' .. k) then
-      return require('which-colorscheme.util.' .. k)
+    local raw = rawget(self, k) or nil
+    if raw then
+      return raw
     end
-    return rawget(self, k) or nil
+
+    if M.mod_exists('which-colorscheme.util.' .. k) then
+      return M.rawset(self, k, require('which-colorscheme.util.' .. k))
+    end
   end,
 })
 

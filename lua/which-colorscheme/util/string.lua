@@ -188,9 +188,8 @@ function M.capitalize(str, use_dot, triggers)
     return str
   end
 
-  local strlen, dot = str:len(), true
-  local prev_char, new_str, i = '', '', 1
-  while i <= strlen do
+  local prev_char, new_str, i, dot = '', '', 1, true
+  while i <= str:len() do
     local char = str:sub(i, i)
     if char == char:lower() and vim.list_contains(triggers, prev_char) then
       char = dot and char:upper() or char:lower()
@@ -206,10 +205,7 @@ function M.capitalize(str, use_dot, triggers)
     elseif not use_dot then
       dot = true
     end
-
-    new_str = ('%s%s'):format(new_str, char)
-    prev_char = char
-    i = i + 1
+    new_str, prev_char, i = ('%s%s'):format(new_str, char), char, i + 1
   end
   return new_str
 end
@@ -225,15 +221,16 @@ function M.replace(str, target, new)
     target = { target, { 'string' } },
     new = { new, { 'string' } },
   })
-  if vim.list_contains({ str:len(), target:len(), new:len() }, 0) or new == target then
-    return str
-  end
 
-  local new_str, len = '', str:len()
-  for i = 1, len, 1 do
-    local c = str:sub(i, i)
-    c = c == target and new or c
-    new_str = ('%s%s'):format(new_str, c)
+  local new_str ---@type string
+  if vim.list_contains({ str:len(), target:len(), new:len() }, 0) or new == target then
+    new_str = str
+  else
+    new_str = ''
+    for i = 1, str:len(), 1 do
+      local c = str:sub(i, i)
+      new_str = ('%s%s'):format(new_str, c == target and new or c)
+    end
   end
   return new_str
 end

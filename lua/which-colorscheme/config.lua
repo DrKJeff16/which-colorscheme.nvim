@@ -4,28 +4,30 @@ local Util = require('which-colorscheme.util')
 
 local colors = {} ---@type string[]
 local keys ---@type wk.Spec
-local maps ---@type WhichColorschemeGroups
+local maps ---@type WhichColorschemeOpts.Groups
 local manually_set = {} ---@type string[]
 local new_colors = {} ---@type string[]
 
+local defaults = { ---@type WhichColorschemeDefaults
+  custom_groups = {},
+  custom_only = false,
+  description_prefix = '',
+  enabled = true,
+  excluded = {},
+  group_name = 'Colorschemes',
+  grouping = { labels = {}, uppercase_groups = false, random = false, inverse = false, current_first = true },
+  include_builtin = false,
+  prefix = '<leader>C',
+}
+
 ---@class WhichColorscheme.Config
----@field maps WhichColorschemeGroups
+---@field maps WhichColorschemeOpts.Groups
 local M = {}
 
 ---@return WhichColorschemeOpts defaults
 ---@nodiscard
 function M.get_defaults()
-  return { ---@type WhichColorschemeOpts
-    custom_groups = {},
-    custom_only = false,
-    description_prefix = '',
-    enabled = true,
-    excluded = {},
-    group_name = 'Colorschemes',
-    grouping = { labels = {}, uppercase_groups = false, random = false, inverse = false, current_first = true },
-    include_builtin = false,
-    prefix = '<leader>C',
-  }
+  return defaults
 end
 
 local options ---@type WhichColorschemeOpts
@@ -45,7 +47,7 @@ end
 function M.set(k, v)
   Util.validate({ k = { k, { 'string' } } })
 
-  if M.get_defaults()[k] then
+  if defaults[k] then
     options[k] = v
   end
 end
@@ -57,7 +59,7 @@ function M.setup(opts)
   end
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
-  options = vim.tbl_deep_extend('force', M.get_defaults(), opts or {})
+  options = vim.tbl_deep_extend('force', defaults, opts or {})
   vim.g.which_colorscheme_setup = 1
 
   if options.enabled then

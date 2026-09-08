@@ -1,5 +1,4 @@
 ---@meta
----@diagnostic disable:unused-local
 
 ---Non-legacy validation spec (>=v0.11)
 ---@class WhichColorscheme.ValidateSpec
@@ -19,9 +18,101 @@
 ---@field [8]? string
 ---@field [9]? string
 
----@alias WhichColorschemeGroups table <string, WhichColorschemeGroup>
+---@class WhichColorschemeOpts.Labels
+---@field A? WhichColorschemeGroup
+---@field B? WhichColorschemeGroup
+---@field C? WhichColorschemeGroup
+---@field D? WhichColorschemeGroup
+---@field E? WhichColorschemeGroup
+---@field F? WhichColorschemeGroup
+---@field G? WhichColorschemeGroup
+---@field H? WhichColorschemeGroup
+---@field I? WhichColorschemeGroup
+---@field J? WhichColorschemeGroup
+---@field K? WhichColorschemeGroup
+---@field L? WhichColorschemeGroup
+---@field M? WhichColorschemeGroup
+---@field N? WhichColorschemeGroup
+---@field O? WhichColorschemeGroup
+---@field P? WhichColorschemeGroup
+---@field Q? WhichColorschemeGroup
+---@field R? WhichColorschemeGroup
+---@field S? WhichColorschemeGroup
+---@field T? WhichColorschemeGroup
+---@field U? WhichColorschemeGroup
+---@field V? WhichColorschemeGroup
+---@field W? WhichColorschemeGroup
+---@field Y? WhichColorschemeGroup
+---@field Z? WhichColorschemeGroup
+---@field ["'"]? WhichColorschemeGroup
+---@field ['!']? WhichColorschemeGroup
+---@field ['"']? WhichColorschemeGroup
+---@field ['#']? WhichColorschemeGroup
+---@field ['$']? WhichColorschemeGroup
+---@field ['%']? WhichColorschemeGroup
+---@field ['&']? WhichColorschemeGroup
+---@field ['(']? WhichColorschemeGroup
+---@field [')']? WhichColorschemeGroup
+---@field ['*']? WhichColorschemeGroup
+---@field ['+']? WhichColorschemeGroup
+---@field [',']? WhichColorschemeGroup
+---@field ['-']? WhichColorschemeGroup
+---@field ['.']? WhichColorschemeGroup
+---@field ['/']? WhichColorschemeGroup
+---@field ['0']? WhichColorschemeGroup
+---@field ['1']? WhichColorschemeGroup
+---@field ['2']? WhichColorschemeGroup
+---@field ['3']? WhichColorschemeGroup
+---@field ['4']? WhichColorschemeGroup
+---@field ['5']? WhichColorschemeGroup
+---@field ['6']? WhichColorschemeGroup
+---@field ['7']? WhichColorschemeGroup
+---@field ['8']? WhichColorschemeGroup
+---@field ['9']? WhichColorschemeGroup
+---@field [':']? WhichColorschemeGroup
+---@field [';']? WhichColorschemeGroup
+---@field ['<']? WhichColorschemeGroup
+---@field ['=']? WhichColorschemeGroup
+---@field ['>']? WhichColorschemeGroup
+---@field ['?']? WhichColorschemeGroup
+---@field ['@']? WhichColorschemeGroup
+---@field ['[']? WhichColorschemeGroup
+---@field ['\\']? WhichColorschemeGroup
+---@field [']']? WhichColorschemeGroup
+---@field ['^']? WhichColorschemeGroup
+---@field ['_']? WhichColorschemeGroup
+---@field ['`']? WhichColorschemeGroup
+---@field ['{']? WhichColorschemeGroup
+---@field ['|']? WhichColorschemeGroup
+---@field ['}']? WhichColorschemeGroup
+---@field ['~']? WhichColorschemeGroup
+---@field a? WhichColorschemeGroup
+---@field b? WhichColorschemeGroup
+---@field c? WhichColorschemeGroup
+---@field d? WhichColorschemeGroup
+---@field e? WhichColorschemeGroup
+---@field f? WhichColorschemeGroup
+---@field g? WhichColorschemeGroup
+---@field h? WhichColorschemeGroup
+---@field i? WhichColorschemeGroup
+---@field j? WhichColorschemeGroup
+---@field k? WhichColorschemeGroup
+---@field l? WhichColorschemeGroup
+---@field m? WhichColorschemeGroup
+---@field n? WhichColorschemeGroup
+---@field o? WhichColorschemeGroup
+---@field p? WhichColorschemeGroup
+---@field q? WhichColorschemeGroup
+---@field r? WhichColorschemeGroup
+---@field s? WhichColorschemeGroup
+---@field t? WhichColorschemeGroup
+---@field u? WhichColorschemeGroup
+---@field v? WhichColorschemeGroup
+---@field w? WhichColorschemeGroup
+---@field y? WhichColorschemeGroup
+---@field z? WhichColorschemeGroup
 
----@class WhichColorschemeGrouping.Labels
+---@class WhichColorschemeOpts.Groups
 ---@field A? string
 ---@field B? string
 ---@field C? string
@@ -75,23 +166,41 @@
 ---@field y? string
 ---@field z? string
 
----@class WhichColorschemeGrouping
+---@class WhichColorschemeOpts.Grouping
 ---@field current_first? boolean
 ---@field inverse? boolean
----@field labels? WhichColorschemeGrouping.Labels|table<Letter, string>
+---@field labels? WhichColorschemeOpts.Labels
 ---@field random? boolean
 ---@field uppercase_groups? boolean
 
+---@class WhichColorschemeDefaults.Grouping: WhichColorschemeOpts.Grouping
+---@field current_first boolean
+---@field inverse boolean
+---@field labels WhichColorschemeOpts.Labels
+---@field random boolean
+---@field uppercase_groups boolean
+
 ---@class WhichColorschemeOpts
----@field custom_groups? WhichColorschemeGroups
+---@field custom_groups? WhichColorschemeOpts.Groups
 ---@field custom_only? boolean
 ---@field description_prefix? string
 ---@field enabled? boolean
 ---@field excluded? string[]
 ---@field group_name? string
----@field grouping? WhichColorschemeGrouping
+---@field grouping? WhichColorschemeOpts.Grouping
 ---@field include_builtin? boolean
 ---@field prefix? string
+
+---@class WhichColorschemeDefaults: WhichColorschemeOpts
+---@field custom_groups WhichColorschemeOpts.Groups
+---@field custom_only boolean
+---@field description_prefix string
+---@field enabled boolean
+---@field excluded string[]
+---@field group_name string
+---@field grouping WhichColorschemeOpts.Grouping
+---@field include_builtin boolean
+---@field prefix string
 
 ---@alias Letter
 ---|'a'

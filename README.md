@@ -56,24 +56,18 @@ The default setup options are the following:
 
 ```lua
 {
-  -- The prefix to your keymap
-  prefix = '<leader>C',
-
-  -- The prefix group in `which-key.nvim`
-  group_name = 'Colorschemes',
-
-  -- Whether to include the built-in Neovim colorschemes
-  include_builtin = false,
+  -- Custom groups for colorschemes (see the `Custom Groups` section below)
+  custom_groups = {},
 
   -- Whether to only map the colorschemes defined in `custom_groups`.
   -- NOTE: If `custom_groups` is empty this will be ignored
   custom_only = false,
 
-  -- Custom groups for colorschemes (see the `Custom Groups` section below)
-  custom_groups = {},
-
   -- List of colorscheme names/variants to ignore
   excluded = {},
+
+  -- The prefix group in `which-key.nvim`
+  group_name = 'Colorschemes',
 
   grouping = {
     -- The labels assigned to a given group (see the `Labeling` section below)
@@ -91,6 +85,12 @@ The default setup options are the following:
     -- Whether to put the current colorscheme in the first group
     current_first = true,
   },
+
+  -- Whether to include the built-in Neovim colorschemes
+  include_builtin = false,
+
+  -- The prefix to your keymap
+  prefix = '<leader>C',
 }
 ```
 

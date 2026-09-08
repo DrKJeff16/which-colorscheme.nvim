@@ -34,7 +34,7 @@ local M = {}
 ---@return string current
 ---@nodiscard
 function M.current()
-  return vim.g.colors_name --[[@as string]]
+  return vim.g.colors_name or vim.api.nvim_exec2('colorscheme', { output = true }).output --[[@as string]]
 end
 
 ---@param no_builtins? boolean
@@ -54,7 +54,7 @@ function M.calculate_colorschemes(no_builtins)
         table.insert(colors, color)
       end
     end
-    colorschemes = colors
+    colorschemes = vim.deepcopy(colors)
   end
   return colorschemes
 end
