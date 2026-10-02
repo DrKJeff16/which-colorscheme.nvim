@@ -37,17 +37,17 @@ function M.current()
   return vim.g.colors_name or vim.api.nvim_exec2('colorscheme', { output = true }).output --[[@as string]]
 end
 
----@param no_builtins? boolean
+---@param with_builtins? boolean
 ---@return string[] colorschemes
 ---@nodiscard
-function M.calculate_colorschemes(no_builtins)
-  require('which-colorscheme.util').validate({ no_builtins = { no_builtins, { 'boolean', 'nil' }, true } })
-  if no_builtins == nil then
-    no_builtins = true
+function M.calculate_colorschemes(with_builtins)
+  require('which-colorscheme.util').validate({ with_builtins = { with_builtins, { 'boolean', 'nil' }, true } })
+  if with_builtins == nil then
+    with_builtins = require('which-colorscheme.config').get().include_builtin
   end
 
   local colorschemes = vim.fn.getcompletion('', 'color')
-  if no_builtins then
+  if not with_builtins then
     local colors = {} ---@type string[]
     for _, color in ipairs(colorschemes) do
       if not vim.list_contains(builtins, color) then

@@ -182,17 +182,14 @@ function M.map()
   end
 
   local Color = require('which-colorscheme.color')
-  colors = Color.calculate_colorschemes(not options.include_builtin)
+  colors = Color.calculate_colorschemes(options.include_builtin)
 
-  if options.grouping then
-    if options.grouping.inverse then
-      colors = Util.reverse(colors)
-    end
-    if options.grouping.random then
-      colors = Util.randomize_list(colors)
-    end
+  if options.grouping and options.grouping.inverse then
+    colors = Util.reverse(colors)
   end
-
+  if options.grouping and options.grouping.random then
+    colors = Util.randomize_list(colors)
+  end
   if options.grouping.current_first then
     colors = Util.move_start(colors, Color.current())
   end
