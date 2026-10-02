@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.1
       - name: Build Project Assets
         run: |
           mkdir -pv which-colorscheme.nvim
@@ -27,7 +27,7 @@ jobs:
           sha512sum which-colorscheme.nvim.7z which-colorscheme.nvim.zip which-colorscheme.nvim.tar.xz which-colorscheme.nvim.tar.gz >| sha512sums.txt
           md5sum which-colorscheme.nvim.7z which-colorscheme.nvim.zip which-colorscheme.nvim.tar.xz which-colorscheme.nvim.tar.gz >| md5sums.txt
       - name: Get Release
-        uses: joutvhu/get-release@v1.0.3
+        uses: joutvhu/get-release@v1.0.4
         with:
           latest: true
           prerelease: true
@@ -41,7 +41,7 @@ jobs:
           echo ${{ github.sha }} > Release.txt
           cat Release.txt
       - name: Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v3.0.3
         if: github.ref_type == 'tag'
         with:
           files: |
