@@ -114,7 +114,7 @@ function M.generate_maps(group, custom_only)
     end
   end
 
-  if not custom_only or vim.tbl_isempty(manually_set) then
+  if not custom_only or #manually_set == 0 then
     for _, color in ipairs(colors) do
       if not (vim.list_contains(excluded, color) or vim.list_contains(new_colors, color)) then
         table.insert(new_colors, color)
