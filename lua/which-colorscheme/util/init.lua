@@ -1,8 +1,32 @@
 ---@module 'which-colorscheme._meta'
 
 ---@class WhichColorscheme.Util
----@field color WhichColorscheme.Util.String
+---@field string WhichColorscheme.Util.String
 local M = {}
+
+---@generic T: table, F
+---@param t T
+---@param k any
+---@param fallback F
+---@return F fallback
+local function get(t, k, fallback)
+  return M.get(t, k, function()
+    return M.rawset(t, k, fallback)
+  end, true)
+end
+
+setmetatable(M, {
+  __index = function(self, k) ---@param self WhichColorscheme.Util
+    local raw = M.get(self, k)
+    if raw ~= nil then
+      return raw
+    end
+
+    if self.mod_exists('which-colorscheme.util.' .. k) then
+      return get(self, k, require('which-colorscheme.util.' .. k))
+    end
+  end,
+})
 
 ---@class DirectionFuncs
 M.direction_funcs = {}
@@ -50,7 +74,7 @@ function M.format_per_type(t, data, sep, constraints)
 
   if t == 'string' then
     local res = ('%s`"%s"`'):format(sep, data)
-    if not M.is_type('table', constraints) or (constraints and vim.list_contains(constraints, data)) then
+    if type(constraints) ~= 'table' or (constraints and vim.list_contains(constraints, data)) then
       return res
     end
     return res, true
@@ -75,9 +99,8 @@ function M.format_per_type(t, data, sep, constraints)
 
   sep = ('%s '):format(sep)
   for k, v in pairs(data) do
-    k = M.is_type('number', k) and ('[%s]'):format(tostring(k)) or k
-    msg = ('%s\n%s`%s`: '):format(msg, sep, k)
-    if not M.is_type('string', v) then
+    msg = ('%s\n%s`%s`: '):format(msg, sep, type(k) == 'number' and ('[%s]'):format(tostring(k)) or k)
+    if type(v) ~= 'string' then
       msg = ('%s%s'):format(msg, M.format_per_type(type(v), v, sep))
     else
       msg = ('%s`"%s"`'):format(msg, v)
@@ -162,30 +185,28 @@ end
 function M.dedup(T)
   M.validate({ T = { T, { 'table' } } })
 
-  if vim.tbl_isempty(T) then
-    return T
-  end
   if not vim.islist(T) then
     error('Table is not list-like!', vim.log.levels.ERROR)
   end
 
-  local NT = {} ---@type any[]
-  for _, v in ipairs(T) do
-    local not_dup = false
-    ---@cast v table
-    if M.is_type('table', v) then
-      not_dup = not vim.tbl_contains(NT, function(val)
-        return vim.deep_equal(val, v)
-      end, { predicate = true })
-    else
-      ---@cast v any
-      not_dup = not vim.list_contains(NT, v)
+  if #T > 0 then
+    local NT = {} ---@type any[]
+    for _, v in ipairs(T) do
+      local not_dup = false
+      if type(v) == 'table' then
+        not_dup = not vim.tbl_contains(NT, function(val)
+          return vim.deep_equal(val, v)
+        end, { predicate = true })
+      else
+        not_dup = not vim.list_contains(NT, v)
+      end
+      if not_dup then
+        table.insert(NT, v)
+      end
     end
-    if not_dup then
-      table.insert(NT, v)
-    end
+    T = vim.deepcopy(NT)
   end
-  return NT
+  return T
 end
 
 ---@param c string
@@ -200,15 +221,13 @@ function M.displace_letter(c, direction)
   direction = direction or 'next'
   direction = vim.list_contains({ 'next', 'prev' }, direction) and direction or 'next'
 
-  local A = vim.deepcopy(require('which-colorscheme.util.string').alphabet)
-  local LOWER_K, UPPER_K = vim.tbl_keys(A.lower_map), vim.tbl_keys(A.upper_map) ---@type string[], string[]
-  if not (vim.list_contains(LOWER_K, c) or vim.list_contains(UPPER_K, c)) then
-    return 'a'
-  end
-
-  local map = vim.list_contains(LOWER_K, c) and A.lower_map or A.upper_map
-  local d = direction == 'prev' and 'r' or 'l'
-  return M.mv_tbl_values(map, nil, d)[c]
+  return not (vim.tbl_contains(M.string.alphabet.lower_map, c) or vim.tbl_contains(M.string.alphabet.upper_map, c))
+      and 'a'
+    or M.mv_tbl_values(
+      vim.tbl_contains(M.string.alphabet.lower_map, c) and M.string.alphabet.lower_map or M.string.alphabet.upper_map,
+      nil,
+      direction == 'prev' and 'r' or 'l'
+    )[c]
 end
 
 ---@param T table<string|integer, any>
@@ -216,10 +235,6 @@ end
 ---@nodiscard
 function M.get_dict_size(T)
   M.validate({ T = { T, { 'table' } } })
-
-  if vim.tbl_isempty(T) then
-    return 0
-  end
 
   local len = 0
   for _ in pairs(T) do
@@ -235,39 +250,33 @@ end
 ---If the data passed to the function is not a table,
 ---an error will be raised.
 --- ---
----@generic T
----@param T T[]
----@return T[] T
+---@generic T: table
+---@param T T
+---@return T T
 ---@nodiscard
 function M.reverse(T)
   M.validate({ T = { T, { 'table' } } })
 
-  if vim.tbl_isempty(T) then
-    return T
-  end
-
-  local len = #T
-  for i = 1, math.floor(len / 2) do
-    T[i], T[len - i + 1] = T[len - i + 1], T[i]
+  if #T > 0 then
+    local len = #T
+    for i = 1, math.floor(len / 2) do
+      T[i], T[len - i + 1] = T[len - i + 1], T[i]
+    end
   end
   return T
 end
 
----@generic T
----@param T T[]
----@return T[] new_list
+---@generic T: table
+---@param T T
+---@return T new_list
 ---@nodiscard
 function M.randomize_list(T)
   M.validate({ T = { T, { 'table' } } })
   if not vim.islist(T) then
     error('Table is not a list!', vim.log.levels.ERROR)
   end
-  if vim.tbl_isempty(T) then
-    return T
-  end
 
-  local new_list = {} ---@type (string|number)[]
-  local len = #T
+  local new_list, len = {}, #T ---@type (string|number)[], integer
   while #new_list < len do
     local item = T[math.random(1, len)]
     if not vim.list_contains(new_list, item) then
@@ -318,12 +327,11 @@ function M.mod_exists(mod, return_mod)
   if mod == '' then
     return false
   end
-  local exists, module = pcall(require, mod)
 
+  local exists, module = pcall(require, mod)
   if return_mod then
     return exists, module
   end
-
   return exists
 end
 
@@ -342,8 +350,7 @@ function M.is_int(num, cond)
     cond = true
   end
 
-  local is_int = math.floor(num) == num and math.ceil(num) == num
-  return is_int and cond
+  return math.floor(num) == num and math.ceil(num) == num and cond
 end
 
 ---Checks whether `data` is of type `t` or not.
@@ -365,18 +372,15 @@ end
 function M.executable(exe)
   M.validate({ exe = { exe, { 'string', 'table' } } })
 
-  ---@cast exe string
-  if M.is_type('string', exe) then
-    return vim.fn.executable(exe) == 1
-  end
-
-  local res = false
-
-  ---@cast exe string[]
-  for _, v in ipairs(exe) do
-    res = M.executable(v)
-    if not res then
-      break
+  local res = false ---@type boolean
+  if type(exe) == 'string' then
+    res = vim.fn.executable(exe) == 1
+  else
+    for _, v in ipairs(exe) do
+      res = M.executable(v)
+      if not res then
+        break
+      end
     end
   end
   return res
@@ -398,33 +402,25 @@ function M.lstrip(char, str)
     return str
   end
 
-  ---@cast char string[]
-  if M.is_type('table', char) then
-    if not vim.tbl_isempty(char) then
-      for _, c in ipairs(char) do
-        str = M.lstrip(c, str)
+  if type(char) == 'table' then
+    for _, c in ipairs(char) do
+      str = M.lstrip(c, str)
+    end
+  elseif vim.startswith(str, char) and char:len() <= str:len() then
+    local i, new_str, other = 1, '', false
+    while i <= str:len() and i + char:len() - 1 <= str:len() do
+      if str:sub(i, i + char:len() - 1) ~= char and not other then
+        other = true
       end
+      if other then
+        new_str = ('%s%s'):format(new_str, str:sub(i, i))
+      end
+      i = i + 1
     end
-    return str
-  end
 
-  ---@cast char string
-  if not vim.startswith(str, char) or char:len() > str:len() then
-    return str
+    str = new_str --[[@as string]]
   end
-
-  local i, len, new_str = 1, str:len(), ''
-  local other = false
-  while i <= len and i + char:len() - 1 <= len do
-    if str:sub(i, i + char:len() - 1) ~= char and not other then
-      other = true
-    end
-    if other then
-      new_str = ('%s%s'):format(new_str, str:sub(i, i))
-    end
-    i = i + 1
-  end
-  return new_str
+  return str
 end
 
 ---Right strip given a leading string (or list of strings) within a string, if any.
@@ -443,26 +439,14 @@ function M.rstrip(char, str)
     return str
   end
 
-  ---@cast char string[]
-  if M.is_type('table', char) then
-    if not vim.tbl_isempty(char) then
-      for _, c in ipairs(char) do
-        str = M.rstrip(c, str)
-      end
+  if type(char) == 'table' then
+    for _, c in ipairs(char) do
+      str = M.rstrip(c, str)
     end
-    return str
+  elseif char:len() <= str:len() and vim.startswith(str:reverse(), char) then
+    str = M.lstrip(char, str:reverse()):reverse()
   end
-
-  ---@cast char string
-  if char:len() > str:len() then
-    return str
-  end
-
-  if not vim.startswith(str:reverse(), char) then
-    return str
-  end
-
-  return M.lstrip(char, str:reverse()):reverse()
+  return str
 end
 
 ---Strip given a leading string (or list of strings) within a string, if any, bidirectionally.
@@ -481,22 +465,14 @@ function M.strip(char, str)
     return str
   end
 
-  if M.is_type('table', char) then
-    ---@cast char string[]
-    if not vim.tbl_isempty(char) then
-      for _, c in ipairs(char) do
-        str = M.strip(c, str)
-      end
+  if type(char) == 'table' then
+    for _, c in ipairs(char) do
+      str = M.strip(c, str)
     end
-    return str
+  elseif char:len() <= str:len() then
+    str = M.rstrip(char, M.lstrip(char, str))
   end
-
-  ---@cast char string
-  if char:len() > str:len() then
-    return str
-  end
-
-  return M.rstrip(char, M.lstrip(char, str))
+  return str
 end
 
 ---@generic T: table, V
@@ -509,18 +485,36 @@ function M.rawset(t, k, v)
   return v
 end
 
-local Util = setmetatable(M, { ---@type WhichColorscheme.Util
-  __index = function(self, k)
-    local raw = rawget(self, k) or nil
-    if raw then
+---@generic T: table, F, K, V
+---@param t T<K, V>
+---@param k K
+---@param fallback F|fun(): raw: F
+---@param is_rawset boolean
+---@return F|V?
+---@overload fun(t: T<K, V>, k: K): raw: V?
+---@overload fun(t: T<K, V>, k: K, fallback: F): raw: F|V
+---@overload fun(t: T<K, V>, k: K, fallback: F, is_rawset: false): raw: F|V
+---@overload fun(t: T<K, V>, k: K, fallback: (fun(): raw: F), is_rawset: true): raw: F|V
+function M.get(t, k, fallback, is_rawset)
+  if is_rawset == nil then
+    is_rawset = false
+  end
+
+  if k ~= nil then
+    local raw = rawget(t, k) or nil --[[@as unknown|nil|?]]
+    if raw ~= nil or fallback == nil then
       return raw
     end
 
-    if M.mod_exists('which-colorscheme.util.' .. k) then
-      return M.rawset(self, k, require('which-colorscheme.util.' .. k))
+    if is_rawset then
+      ---@cast fallback fun(): any
+      local _, res = pcall(fallback)
+      return res
     end
-  end,
-})
+    ---@cast fallback any
+    return fallback
+  end
+end
 
-return Util
+return M
 -- vim: set ts=2 sts=2 sw=2 et ai si sta:

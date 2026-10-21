@@ -7,7 +7,6 @@ local keys ---@type wk.Spec
 local maps ---@type WhichColorschemeOpts.Groups
 local manually_set = {} ---@type string[]
 local new_colors = {} ---@type string[]
-
 local defaults = { ---@type WhichColorschemeDefaults
   custom_groups = {},
   custom_only = false,
@@ -78,8 +77,6 @@ function M.setup(opts)
     })
 
     map()
-
-    require('which-colorscheme.commands').create()
   end
 end
 
