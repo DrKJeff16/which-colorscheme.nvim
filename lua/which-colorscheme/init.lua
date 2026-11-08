@@ -14,6 +14,8 @@ end
 ---@class WhichColorscheme
 ---@field color WhichColorscheme.Color
 ---@field config WhichColorscheme.Config
+---@field disable function
+---@field enable function
 ---@field health WhichColorscheme.Health
 ---@field setup (fun())|(fun(opts: WhichColorschemeOpts))
 ---@field util WhichColorscheme.Util
@@ -34,21 +36,23 @@ setmetatable(M, {
     if Util.mod_exists('which-colorscheme.' .. k) then
       return get(self, k, require('which-colorscheme.' .. k))
     end
+    if k == 'disable' then
+      return get(self, k, function()
+        self.config.set('enabled', false)
+        self.config.unmap()
+      end)
+    end
+    if k == 'enable' then
+      return get(self, k, function()
+        self.config.set('enabled', true)
+        self.config.map()
+      end)
+    end
     if k == 'setup' then
       return get(self, k, self.config.setup)
     end
   end,
 })
-
-function M.disable()
-  M.config.set('enabled', false)
-  M.config.unmap()
-end
-
-function M.enable()
-  M.config.set('enabled', true)
-  M.config.map()
-end
 
 return M
 -- vim: set ts=2 sts=2 sw=2 et ai si sta:

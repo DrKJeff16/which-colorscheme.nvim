@@ -37,8 +37,9 @@ function M.current()
   return vim.g.colors_name or vim.api.nvim_exec2('colorscheme', { output = true }).output --[[@as string]]
 end
 
----@param with_builtins? boolean
+---@param with_builtins boolean
 ---@return string[] colorschemes
+---@overload fun(): colorschemes: string[]
 ---@nodiscard
 function M.calculate_colorschemes(with_builtins)
   require('which-colorscheme.util').validate({ with_builtins = { with_builtins, { 'boolean', 'nil' }, true } })

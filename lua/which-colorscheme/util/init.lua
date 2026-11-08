@@ -22,6 +22,11 @@ setmetatable(M, {
       return raw
     end
 
+    if type(k) ~= 'string' then
+      return
+    end
+
+    ---@cast k string
     if self.mod_exists('which-colorscheme.util.' .. k) then
       return get(self, k, require('which-colorscheme.util.' .. k))
     end
@@ -46,10 +51,10 @@ function M.direction_funcs.r(t)
   return res
 end
 function M.direction_funcs.l(t)
-  local keys = vim.tbl_keys(t) ---@type string[]
+  local res = {} ---@type table<string, any>
+  local keys = vim.tbl_keys(t) --[[@as string[]\]]
   table.sort(keys)
 
-  local res = {} ---@type table<string, any>
   for i, v in ipairs(keys) do
     res[v] = t[keys[i == #keys and 1 or (i + 1)]]
   end
@@ -58,10 +63,13 @@ end
 
 ---@param t type
 ---@param data any
----@param sep? string
----@param constraints? string[]
----@return string
----@return boolean|nil|?
+---@param sep string
+---@param constraints string[]
+---@return string txt
+---@return boolean|nil|? ok
+---@overload fun(t: type, data: any): txt: string, ok: boolean|nil|?
+---@overload fun(t: type, data: any, sep: string): txt: string, ok: boolean|nil|?
+---@overload fun(t: type, data: any, sep: nil, constraints: string[]): txt: string, ok: boolean|nil|?
 ---@nodiscard
 function M.format_per_type(t, data, sep, constraints)
   M.validate({
@@ -100,11 +108,8 @@ function M.format_per_type(t, data, sep, constraints)
   sep = ('%s '):format(sep)
   for k, v in pairs(data) do
     msg = ('%s\n%s`%s`: '):format(msg, sep, type(k) == 'number' and ('[%s]'):format(tostring(k)) or k)
-    if type(v) ~= 'string' then
-      msg = ('%s%s'):format(msg, M.format_per_type(type(v), v, sep))
-    else
-      msg = ('%s`"%s"`'):format(msg, v)
-    end
+    msg = type(v) == 'string' and ('%s`"%s"`'):format(msg, v)
+      or ('%s%s'):format(msg, M.format_per_type(type(v), v, sep))
   end
   return msg
 end
@@ -168,7 +173,7 @@ end
 ---@return boolean win32
 ---@nodiscard
 function M.is_windows()
-  return M.vim_has('win32')
+  return vim.fn.has('win32') == 1
 end
 
 ---Get rid of all duplicates in the given list.
@@ -185,11 +190,7 @@ end
 function M.dedup(T)
   M.validate({ T = { T, { 'table' } } })
 
-  if not vim.islist(T) then
-    error('Table is not list-like!', vim.log.levels.ERROR)
-  end
-
-  if #T > 0 then
+  if vim.islist(T) then
     local NT = {} ---@type any[]
     for _, v in ipairs(T) do
       local not_dup = false
@@ -210,8 +211,9 @@ function M.dedup(T)
 end
 
 ---@param c string
----@param direction? 'next'|'prev'
+---@param direction 'next'|'prev'
 ---@return string letter
+---@overload fun(c: string): letter: string
 ---@nodiscard
 function M.displace_letter(c, direction)
   M.validate({
@@ -230,7 +232,7 @@ function M.displace_letter(c, direction)
     )[c]
 end
 
----@param T table<string|integer, any>
+---@param T table
 ---@return integer len
 ---@nodiscard
 function M.get_dict_size(T)
@@ -257,11 +259,8 @@ end
 function M.reverse(T)
   M.validate({ T = { T, { 'table' } } })
 
-  if #T > 0 then
-    local len = #T
-    for i = 1, math.floor(len / 2) do
-      T[i], T[len - i + 1] = T[len - i + 1], T[i]
-    end
+  for i = 1, math.floor(#T / 2) do
+    T[i], T[#T - i + 1] = T[#T - i + 1], T[i]
   end
   return T
 end
@@ -272,13 +271,12 @@ end
 ---@nodiscard
 function M.randomize_list(T)
   M.validate({ T = { T, { 'table' } } })
-  if not vim.islist(T) then
-    error('Table is not a list!', vim.log.levels.ERROR)
-  end
 
-  local new_list, len = {}, #T ---@type (string|number)[], integer
-  while #new_list < len do
-    local item = T[math.random(1, len)]
+  assert(vim.islist(T), 'Table is not list-like')
+
+  local new_list = {} ---@type table
+  while #new_list < #T do
+    local item = T[math.random(1, #T)]
     if not vim.list_contains(new_list, item) then
       table.insert(new_list, item)
     end
@@ -287,9 +285,12 @@ function M.randomize_list(T)
 end
 
 ---@param T table<string, any>
----@param steps? integer
----@param direction? 'l'|'r'
+---@param steps integer
+---@param direction 'l'|'r'
 ---@return table<string, any> T
+---@overload fun(T: table<string, any>): T: table<string, any>
+---@overload fun(T: table<string, any>, steps: integer): T: table<string, any>
+---@overload fun(T: table<string, any>, steps: nil, directior: 'l'|'r'): T: table<string, any>
 ---@nodiscard
 function M.mv_tbl_values(T, steps, direction)
   M.validate({
@@ -300,10 +301,9 @@ function M.mv_tbl_values(T, steps, direction)
   steps = (steps and M.is_int(steps)) and steps or 1
   direction = (direction and vim.list_contains({ 'l', 'r' }, direction)) and direction or 'r'
 
-  local func = M.direction_funcs[direction]
+  local func = M.direction_funcs[direction] --[[@as fun(t: any): t: table<string, any>]]
   while steps > 0 do
-    T = func(T)
-    steps = steps - 1
+    T, steps = func(T), steps - 1
   end
   return T
 end
@@ -311,9 +311,10 @@ end
 ---Checks if module `mod` exists to be imported.
 --- ---
 ---@param mod string The `require()` argument to be checked
----@param return_mod? boolean Whether to return the called module
+---@param return_mod boolean Whether to return the called module
 ---@return boolean exists A boolean indicating whether the module exists or not
----@return unknown? module
+---@return unknown|nil|? module
+---@overload fun(mod: string): exists: boolean
 ---@nodiscard
 function M.mod_exists(mod, return_mod)
   M.validate({
@@ -322,10 +323,6 @@ function M.mod_exists(mod, return_mod)
   })
   if return_mod == nil then
     return_mod = false
-  end
-
-  if mod == '' then
-    return false
   end
 
   local exists, module = pcall(require, mod)
@@ -338,8 +335,9 @@ end
 ---Checks if a given number is type integer.
 --- ---
 ---@param num number
----@param cond? boolean
+---@param cond boolean
 ---@return boolean int
+---@overload fun(num: number): int: boolean
 ---@nodiscard
 function M.is_int(num, cond)
   M.validate({

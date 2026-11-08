@@ -41,21 +41,19 @@ function M.get_colors()
   return colors
 end
 
----@param k string
+---@param k any
 ---@param v any
 function M.set(k, v)
-  Util.validate({ k = { k, { 'string' } } })
-
   if defaults[k] then
     options[k] = v
   end
 end
 
----@param opts? WhichColorschemeOpts
+---@param opts WhichColorschemeOpts
+---@overload fun()
 function M.setup(opts)
-  if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!')
-  end
+  assert(Util.mod_exists('which-key'), 'which-key.nvim is not installed')
+
   Util.validate({ opts = { opts, { 'table', 'nil' }, true } })
 
   options = vim.tbl_deep_extend('force', defaults, opts or {})
@@ -81,7 +79,8 @@ function M.setup(opts)
 end
 
 ---@param group Letter
----@param custom_only? boolean
+---@param custom_only boolean
+---@overload fun(group: Letter)
 function M.generate_maps(group, custom_only)
   Util.validate({
     group = { group, { 'string' } },
@@ -148,20 +147,18 @@ function M.generate_maps(group, custom_only)
 end
 
 function M.unmap()
-  if vim.g.which_colorscheme_setup ~= 1 then
-    error('`which-colorscheme.nvim` has not been setup!')
-  end
-  if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!')
+  assert(vim.g.which_colorscheme_setup == 1, '`which-colorscheme.nvim` has not been setup')
+  assert(Util.mod_exists('which-key'), 'which-key.nvim is not installed')
+
+  for i in pairs(keys) do
+    keys[i].hidden = true
   end
 
   if not vim.tbl_isempty(keys) then
-    for i in pairs(keys) do
-      keys[i].hidden = true
-    end
     pcall(require('which-key').add, vim.deepcopy(keys))
-    vim.g.which_colorscheme_enabled = 0
   end
+
+  vim.g.which_colorscheme_enabled = 0
 end
 
 ---@return wk.Spec keys
@@ -171,12 +168,8 @@ function M.get_keys()
 end
 
 function M.map()
-  if vim.g.which_colorscheme_setup ~= 1 then
-    error('`which-colorscheme.nvim` has not been setup!')
-  end
-  if not Util.mod_exists('which-key') then
-    error('which-key.nvim is not installed!')
-  end
+  assert(vim.g.which_colorscheme_setup == 1, '`which-colorscheme.nvim` has not been setup')
+  assert(Util.mod_exists('which-key'), '`which-key.nvim` is not installed')
 
   local Color = require('which-colorscheme.color')
   colors = Color.calculate_colorschemes(options.include_builtin)
@@ -207,7 +200,7 @@ function M.map()
       table.insert(keys, {
         ('%s%s%s'):format(prefix, group, i),
         function()
-          pcall(vim.cmd.colorscheme, color)
+          pcall(vim.cmd.colorscheme, { args = { color } })
         end,
         desc = ('%s %s'):format(options.description_prefix or '', color),
         mode = 'n',
